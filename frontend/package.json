@@ -4,8 +4,9 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "gen_imports": "node gen_imports.js",
     "build": "webpack",
-    "start": "webpack-dev-server --hot"
+    "dev": "webpack-dev-server --hot"
   },
   "keywords": [],
   "author": "",
