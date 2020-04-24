@@ -1,6 +1,7 @@
 const fs = require("fs");
 const path = require("path");
 
+// $ find dirpath -type f -name "*.vue"
 const getFiles = (dirpath, list) => {
   const dirents = fs.readdirSync(dirpath, { withFileTypes: true });
   for (const dirent of dirents) {
@@ -8,40 +9,47 @@ const getFiles = (dirpath, list) => {
     if (dirent.isDirectory()) {
       getFiles(fp, list);
     } else {
-      list.push(fp);
+      if (fp.endsWith(".vue")) list.push(fp);
     }
   }
   return list;
 };
 
+// generate {filename / variable name / component name} map
 const basePath = "src/pages";
-const importMap = getFiles(basePath, [])
-  .map((path) => path.replace(`${basePath}/`, "").replace(".vue", ""))
-  .map((path) => ({
-    file: `./pages/${path}`,
-    varname: path.replace("/", "___"),
-    cmpname: path.replace("/", "---"),
-  }));
+const paths = getFiles(basePath, []).map((path) => {
+  // "src/pages/nested/somepage.vue" => "nested/somepage"
+  return path.replace(`${basePath}/`, "").replace(".vue", "");
+});
 
-const importOut = importMap
-  .map((item) => {
-    return `import ${item.varname} from "${item.file}"`;
+function filename(path) {
+  return `./pages/${path}`;
+}
+function varname(path) {
+  return path.replace("/", "___");
+}
+function cmpname(path) {
+  return path.replace("/", "---");
+}
+
+// file outputs
+const importOut = paths
+  .map((path) => {
+    return `import ${varname(path)} from "${filename(path)}"`;
   })
   .join("\n");
 
-const exportOut = importMap
-  .map((item) => {
-    return `"${item.cmpname}": ${item.varname}`;
+const exportOut = paths
+  .map((path) => {
+    return `"${cmpname(path)}": ${varname(path)}`;
   })
   .join(",\n");
 
-fs.writeFileSync(
-  "src/pages.js",
-  `
+const output = `
 ${importOut}
 
 export let Pages = {
 ${exportOut}
 }
-`
-);
+`;
+fs.writeFileSync("src/pages.js", output);
