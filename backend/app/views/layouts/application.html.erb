@@ -5,7 +5,10 @@
     <%= csrf_meta_tags %>
     <%= csp_meta_tag %>
     <script type="text/javascript">
-      window._pageName = "<%= request.fullpath %>"
+      window._application = {
+        path: "<%= request.fullpath %>",
+        props: JSON.parse('<%= raw(@prop_data) %>')
+      }
     </script>
   </head>
   <body>

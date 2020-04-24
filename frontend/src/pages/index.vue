@@ -1,5 +1,11 @@
 <template>
   <div>
-    <p>Hello, World!</p>
+    <p>{{ props.title }}</p>
   </div>
 </template>
+
+<script>
+export default {
+  props: ["props"],
+};
+</script>
