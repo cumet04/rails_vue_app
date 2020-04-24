@@ -4,11 +4,12 @@
     <title>RailsVue</title>
     <%= csrf_meta_tags %>
     <%= csp_meta_tag %>
-
-    <%= stylesheet_link_tag    'application', media: 'all' %>
+    <script type="text/javascript">
+      window._pageName = "<%= request.fullpath %>"
+    </script>
   </head>
-
   <body>
-    <%= yield %>
+    <div id="app"></div>
+    <script src="<%= assets_url("bundle.js") %>"></script>
   </body>
 </html>

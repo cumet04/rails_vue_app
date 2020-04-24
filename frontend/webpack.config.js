@@ -12,6 +12,12 @@ module.exports = {
   mode: "production",
   devServer: {
     contentBase: path.resolve(__dirname, "public"),
+    headers: {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Allow-Methods": "GET",
+      "Access-Control-Allow-Headers":
+        "X-Requested-With, content-type, Authorization",
+    },
   },
   module: {
     rules: [

@@ -29,7 +29,10 @@ function varname(path) {
   return path.replace("/", "___");
 }
 function cmpname(path) {
-  return path.replace("/", "---");
+  return path
+    .replace(/\/index/, "") // remove "/index"; normalize
+    .replace(/^$/, "index") // "index" for "/"
+    .replace("/", "---");
 }
 
 // file outputs
