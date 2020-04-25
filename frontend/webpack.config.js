@@ -1,6 +1,8 @@
 const path = require("path");
 const VueLoaderPlugin = require("vue-loader/lib/plugin");
 
+const port = process.env.PORT || 8080;
+
 module.exports = {
   entry: "./src/index.js",
   output: {
@@ -9,6 +11,7 @@ module.exports = {
   },
   mode: "production",
   devServer: {
+    port,
     contentBase: path.resolve(__dirname, "public"),
     headers: {
       "Access-Control-Allow-Origin": "*",
