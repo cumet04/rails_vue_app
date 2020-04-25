@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "gen_imports": "node gen_imports.js",
-    "build": "webpack",
+    "build": "npm run gen_imports && webpack",
     "dev": "npm run gen_imports && webpack-dev-server --hot --mode=development"
   },
   "keywords": [],

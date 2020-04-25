@@ -1,5 +1,5 @@
 module ApplicationHelper
   def assets_url(path)
-    "http://localhost:8080/#{path}"
+    "#{Rails.application.config.assets_path}/#{path}"
   end
 end

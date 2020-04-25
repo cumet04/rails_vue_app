@@ -4,7 +4,7 @@ const VueLoaderPlugin = require("vue-loader/lib/plugin");
 module.exports = {
   entry: "./src/index.js",
   output: {
-    path: path.resolve(__dirname, "./dest"),
+    path: path.resolve(__dirname, "../backend/public/assets"),
     filename: "bundle.js",
   },
   mode: "production",
