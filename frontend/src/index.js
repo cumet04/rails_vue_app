@@ -6,7 +6,7 @@ const pageName = window._application.path
   .replace(/\/$/, "") // trim trailing slash
   .replace(/^$/, "index"); // "index" for "/"
 
-window.vm = new Vue({
+new Vue({
   el: "#app",
   components: {
     Page: Pages[pageName],
