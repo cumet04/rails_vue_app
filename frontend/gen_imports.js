@@ -1,3 +1,20 @@
+// ---------- filetree ----------
+// src/
+//   index.js
+//   pages.js
+//   pages/
+//     index.vue
+//     nested/
+//       index.vue
+//       some.vue
+// ---------- pages.js ----------
+// export let Pages = {
+//   "index": require("./pages/index").default,
+//   "nested": require("./pages/nested/index").default,
+//   "nested/some": require("./pages/nested/some").default,
+// };
+// ------------------------------
+
 const fs = require("fs");
 const path = require("path");
 
@@ -15,44 +32,16 @@ const getFiles = (dirpath, list) => {
   return list;
 };
 
-// generate {filename / variable name / component name} map
-const basePath = "src/pages";
-const paths = getFiles(basePath, []).map((path) => {
-  // "src/pages/nested/somepage.vue" => "nested/somepage"
-  return path.replace(`${basePath}/`, "").replace(".vue", "");
-});
-
-function filename(path) {
-  return `./pages/${path}`;
-}
-function varname(path) {
-  return path.replace("/", "___");
-}
-function cmpname(path) {
-  return path
-    .replace(/\/index/, "") // remove "/index"; normalize
-    .replace(/^$/, "index") // "index" for "/"
-    .replace("/", "---");
-}
-
-// file outputs
-const importOut = paths
+const output = getFiles("src/pages", [])
   .map((path) => {
-    return `import ${varname(path)} from "${filename(path)}"`;
+    return path.replace("src/pages/", "").replace(".vue", "");
   })
-  .join("\n");
-
-const exportOut = paths
-  .map((path) => {
-    return `"${cmpname(path)}": ${varname(path)}`;
+  .map((file) => {
+    const path = file
+      .replace(/\/index/, "") // remove "/index"; normalize
+      .replace(/^$/, "index"); // "index" for "/"
+    return `"${path}": require("./pages/${file}").default`;
   })
-  .join(",\n");
+  .join(",");
 
-const output = `
-${importOut}
-
-export let Pages = {
-${exportOut}
-}
-`;
-fs.writeFileSync("src/pages.js", output);
+fs.writeFileSync("src/pages.js", `export let Pages = {${output}}`);

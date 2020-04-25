@@ -7,7 +7,10 @@
   <body>
     <div id="app"></div>
     <script>
-      window._pageName = "nested/some";
+      window._application = {
+        path: "/",
+        props: { title: "title" },
+      };
     </script>
     <script src="./bundle.js"></script>
   </body>
