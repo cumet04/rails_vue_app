@@ -1,3 +1,3 @@
 Rails.application.configure do
-# TODO
+  # TODO
 end
