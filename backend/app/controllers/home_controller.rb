@@ -4,4 +4,10 @@ class HomeController < ApplicationController
       title: "hello world !",
     )
   end
+
+  def create
+    set_prop_data(
+      title: params[:title],
+    )
+  end
 end
