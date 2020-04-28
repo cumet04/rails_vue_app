@@ -1,6 +1,6 @@
 <template>
   <div>
-    <the-header></the-header>
+    <the-header :user="PageProps.user"></the-header>
     <Page :props="PageProps"></Page>
   </div>
 </template>

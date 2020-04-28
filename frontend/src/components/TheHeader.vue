@@ -4,7 +4,7 @@
     <div class="spacer"></div>
     <div class="login">
       <template v-if="user">
-        <div class="user_name">{{ user.name }}</div>
+        <div class="user_name">{{ user.email }}</div>
         <!-- TODO: POST or DELETE -->
         <a href="/logout"></a>
       </template>

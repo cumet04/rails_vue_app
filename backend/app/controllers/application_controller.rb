@@ -10,6 +10,14 @@ class ApplicationController < ActionController::Base
     @prop_data = JSON.generate(data)
   end
 
+  def warden
+    request.env["warden"]
+  end
+
+  def current_user
+    warden.user
+  end
+
   def render_404(e = nil)
     head 404
   end

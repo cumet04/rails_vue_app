@@ -29,6 +29,10 @@ module RailsVue
 
     config.active_record.dump_schema_after_migration = false
 
+    config.middleware.insert_after(ActionDispatch::Flash, Warden::Manager) do |manager|
+      manager.default_strategies(:password)
+    end
+
     # application config
     config.assets_path = ENV.fetch("ASSETS_PATH") # without trailing slash
   end
