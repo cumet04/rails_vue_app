@@ -4,9 +4,12 @@
     <div class="spacer"></div>
     <div class="login">
       <template v-if="user">
-        <div class="user_name">{{ user.email }}</div>
-        <!-- TODO: POST or DELETE -->
-        <a href="/logout"></a>
+        <div class="user_name">login: {{ user.email }}</div>
+        <form action="logout" method="post">
+          <csrf-token-input></csrf-token-input>
+          <input type="hidden" name="_method" value="delete" />
+          <button type="submit">logout</button>
+        </form>
       </template>
       <template v-else>
         <a href="/login">login</a>
