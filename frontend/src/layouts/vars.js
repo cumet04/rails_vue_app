@@ -5,7 +5,7 @@ const name = window._application.path
   .replace(/\/$/, "") // trim trailing slash
   .replace(/^$/, "index"); // "index" for "/"
 
-const PageProps = window._application.props;
+const ViewProps = window._application.props;
 const Page = Pages[name];
 
-export { Page, PageProps };
+export { Page, ViewProps };

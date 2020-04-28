@@ -1,12 +1,12 @@
 <template>
   <div>
-    <the-header :user="PageProps.user"></the-header>
-    <Page :props="PageProps"></Page>
+    <the-header :user="ViewProps.user"></the-header>
+    <Page :props="ViewProps.pageProps"></Page>
   </div>
 </template>
 
 <script>
-import { Page, PageProps } from "./vars";
+import { Page, ViewProps } from "./vars";
 import TheHeader from "~/components/TheHeader";
 
 export default {
@@ -15,7 +15,7 @@ export default {
     "the-header": TheHeader,
   },
   data: () => ({
-    PageProps,
+    ViewProps,
   }),
 };
 </script>

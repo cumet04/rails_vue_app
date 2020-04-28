@@ -1,13 +1,16 @@
 class ApplicationController < ActionController::Base
-  before_action { @prop_data = {} }
-
-  # override ActionController::ImplicitRender for omitting view file per action
-  def default_render
-    render(html: "", layout: true)
+  before_action do
+    view_props[:user] = current_user&.then { |u| { email: u.email } }
   end
 
-  def set_prop_data(data) # data: hash
-    @prop_data = JSON.generate(data)
+  ### helpers
+  def view_props
+    @_view_props ||= {}
+  end
+
+  def page_props
+    # This key is read in frontend layout file
+    view_props[:pageProps] ||= {}
   end
 
   def warden
@@ -16,6 +19,11 @@ class ApplicationController < ActionController::Base
 
   def current_user
     warden.user
+  end
+
+  # override ActionController::ImplicitRender for omitting view file per action
+  def default_render
+    render(html: "", layout: true)
   end
 
   def render_404(e = nil)
