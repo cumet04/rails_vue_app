@@ -32,16 +32,23 @@ const getFiles = (dirpath, list) => {
   return list;
 };
 
-const output = getFiles("src/pages", [])
-  .map((path) => {
-    return path.replace("src/pages/", "").replace(".vue", "");
-  })
-  .map((file) => {
-    const path = file
-      .replace(/\/index/, "") // remove "/index"; normalize
-      .replace(/^$/, "index"); // "index" for "/"
-    return `"${path}": require("./pages/${file}").default`;
-  })
-  .join(",");
+function run() {
+  console.log("generate pages.js");
+  const output = getFiles("src/pages", [])
+    .map((path) => {
+      return path.replace("src/pages/", "").replace(".vue", "");
+    })
+    .map((file) => {
+      const path = file
+        .replace(/\/index/, "") // remove "/index"; normalize
+        .replace(/^$/, "index"); // "index" for "/"
+      return `"${path}": require("./pages/${file}").default`;
+    })
+    .join(",");
 
-fs.writeFileSync("src/pages.js", `export let Pages = {${output}}`);
+  fs.writeFileSync("src/pages.js", `export let Pages = {${output}}`);
+}
+
+module.exports = run;
+
+if (!module.parent) run();
