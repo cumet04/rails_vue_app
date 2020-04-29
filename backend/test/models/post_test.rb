@@ -6,10 +6,10 @@
 #  content      :text(65535)
 #  deleted_at   :datetime
 #  is_available :boolean
-#  title        :string(255)
+#  title        :string(255)      not null
 #  created_at   :datetime         not null
 #  updated_at   :datetime         not null
-#  author_id    :bigint
+#  author_id    :bigint           not null
 #
 # Indexes
 #

@@ -4,8 +4,8 @@
 #
 #  id                 :bigint           not null, primary key
 #  deleted_at         :datetime
-#  email              :string(255)
-#  encrypted_password :string(255)
+#  email              :string(255)      not null
+#  encrypted_password :string(255)      not null
 #  is_available       :boolean
 #  created_at         :datetime         not null
 #  updated_at         :datetime         not null

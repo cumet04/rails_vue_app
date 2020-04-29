@@ -13,9 +13,9 @@
 ActiveRecord::Schema.define(version: 2020_04_29_210508) do
 
   create_table "posts", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
-    t.string "title"
+    t.string "title", null: false
     t.text "content"
-    t.bigint "author_id"
+    t.bigint "author_id", null: false
     t.datetime "deleted_at"
     t.virtual "is_available", type: :boolean, as: "if(`deleted_at` is null,1,NULL)"
     t.datetime "created_at", precision: 6, null: false
@@ -25,8 +25,8 @@ ActiveRecord::Schema.define(version: 2020_04_29_210508) do
   end
 
   create_table "users", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
-    t.string "email"
-    t.string "encrypted_password"
+    t.string "email", null: false
+    t.string "encrypted_password", null: false
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
     t.datetime "deleted_at"
