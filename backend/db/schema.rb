@@ -18,7 +18,8 @@ ActiveRecord::Schema.define(version: 2020_04_29_181750) do
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
     t.datetime "deleted_at"
-    t.index ["email"], name: "index_users_on_email", unique: true
+    t.virtual "is_available", type: :boolean, as: "if(`deleted_at` is null,1,NULL)"
+    t.index ["email", "is_available"], name: "index_users_on_email_and_is_available", unique: true
   end
 
 end

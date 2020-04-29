@@ -6,19 +6,20 @@
 #  deleted_at         :datetime
 #  email              :string(255)
 #  encrypted_password :string(255)
+#  is_available       :boolean
 #  created_at         :datetime         not null
 #  updated_at         :datetime         not null
 #
 # Indexes
 #
-#  index_users_on_email  (email) UNIQUE
+#  index_users_on_email_and_is_available  (email,is_available) UNIQUE
 #
 
 class User < ApplicationRecord
   validates :email, presence: true
   validate :validate_password, if: :new_record?
 
-  scope(:available, ->() { self.where(deleted_at: nil) })
+  scope(:available, ->() { self.where(is_available: true) })
 
   def self.authenticate(email, password)
     self.find_by(email: email, encrypted_password: self.digest(password))
