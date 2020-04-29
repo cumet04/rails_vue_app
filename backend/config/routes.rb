@@ -1,13 +1,15 @@
 Rails.application.routes.draw do
-  root "home#index"
+  scope format: false do
+    root "home#index"
 
-  get "login" => "session#new"
-  post "login" => "session#create"
-  delete "logout" => "session#destroy"
+    get "login" => "session#new"
+    post "login" => "session#create"
+    delete "logout" => "session#destroy"
 
-  resources :users
+    resources :users
 
-  get "*path" => "application#render_404"
+    get "*path" => "application#render_404"
+  end
 end
 
 # memonize routing map
@@ -20,6 +22,7 @@ Rails.application.config._routing_map =
     .to_h { |r|
     [
       r.endpoint,
-      r.path.gsub("(.:format)", "").gsub(":", "_"),
+      r.path.tr(":", "_"), # for path param
+    # when using 'format: true' in routes, add 'remove("(.:format)")'
     ]
   }
