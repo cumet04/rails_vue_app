@@ -3,7 +3,7 @@ class UsersController < ApplicationController
   end
 
   def show
-    page_props[:user] = User.find(params[:id]).then { |u| { email: u.email } }
+    page_props[:user] = ViewData::User.generate(User.find(params[:id]))
   end
 
   def create

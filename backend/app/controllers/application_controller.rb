@@ -1,6 +1,6 @@
 class ApplicationController < ActionController::Base
   before_action do
-    view_props[:user] = current_user&.then { |u| { email: u.email } }
+    view_props[:user] = ViewData::User.generate_nullable(current_user)
   end
 
   ### helpers
