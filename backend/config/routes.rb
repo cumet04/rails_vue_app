@@ -7,9 +7,6 @@ Rails.application.routes.draw do
 
   resources :users
 
-  get "nested" => "nested#index"
-  get "nested/some" => "nested#some"
-
   get "*path" => "application#render_404"
 end
 
