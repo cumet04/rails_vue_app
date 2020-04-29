@@ -7,6 +7,7 @@ Rails.application.routes.draw do
     delete "logout" => "session#destroy"
 
     resources :users
+    resources :posts
 
     get "*path" => "application#render_404"
   end

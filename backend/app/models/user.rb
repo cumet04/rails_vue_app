@@ -18,6 +18,8 @@
 class User < ApplicationRecord
   include Deletable
 
+  has_many :posts, foreign_key: :author_id
+
   validates :email, presence: true
   validate :validate_password, if: :new_record?
 

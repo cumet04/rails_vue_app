@@ -22,4 +22,8 @@
 #
 class Post < ApplicationRecord
   include Deletable
+
+  belongs_to :author, class_name: User.name
+
+  validates :title, presence: true
 end
