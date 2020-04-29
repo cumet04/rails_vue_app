@@ -7,6 +7,7 @@
 ```
 cd backend; bundle; cd ..
 cd frontned; npm ci; cd ..
+docker-compose up -d
 ./shoreman.sh
 ```
 
