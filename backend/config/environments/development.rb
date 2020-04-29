@@ -1,4 +1,5 @@
 Rails.application.configure do
+  # rails config
   config.cache_classes = false
   config.eager_load = false
   config.consider_all_requests_local = true
@@ -20,4 +21,7 @@ Rails.application.configure do
   config.active_record.dump_schema_after_migration = true
 
   config.file_watcher = ActiveSupport::EventedFileUpdateChecker
+
+  # middleware config
+  config.session_options[:secure] = false
 end

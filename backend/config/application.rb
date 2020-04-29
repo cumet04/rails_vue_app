@@ -33,6 +33,16 @@ module RailsVue
       manager.default_strategies(:password)
     end
 
+    # middleware config
+    config.session_store(
+      :redis_store,
+      servers: {
+        host: ENV.fetch("RAILS_REDIS_HOST"),
+        port: ENV.fetch("RAILS_REDIS_PORT"),
+        namespace: "sessions",
+      }, expire_in: 3.days, secure: true,
+    )
+
     # application config
     config.assets_path = ENV.fetch("ASSETS_PATH") # without trailing slash
   end
