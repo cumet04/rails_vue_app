@@ -6,7 +6,8 @@
   "scripts": {
     "gen-imports": "node lib/gen-imports.js",
     "build": "run-s gen-imports && webpack",
-    "dev": "run-p gen-imports dev:server",
+    "dev": "run-p dev:*",
+    "dev:watch": "node lib/watch-dev.js",
     "dev:server": "webpack-dev-server --hot --mode=development"
   },
   "keywords": [],
