@@ -10,6 +10,11 @@
           <input type="hidden" name="_method" value="delete" />
           <button type="submit">logout</button>
         </form>
+        <form :action="`users/${user.id}`" method="post">
+          <csrf-token-input></csrf-token-input>
+          <input type="hidden" name="_method" value="delete" />
+          <button type="submit">unregister</button>
+        </form>
       </template>
       <template v-else>
         <a href="/login">login</a>

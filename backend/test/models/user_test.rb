@@ -3,6 +3,7 @@
 # Table name: users
 #
 #  id                 :integer          not null, primary key
+#  deleted_at         :datetime
 #  email              :string
 #  encrypted_password :string
 #  created_at         :datetime         not null

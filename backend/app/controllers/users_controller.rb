@@ -1,6 +1,6 @@
 class UsersController < ApplicationController
   def index
-    page_props[:users] = User.all.map { |u| ViewData::User.generate(u) }
+    page_props[:users] = User.available.map { |u| ViewData::User.generate(u) }
   end
 
   def create
@@ -14,5 +14,15 @@ class UsersController < ApplicationController
 
   def show
     page_props[:user] = ViewData::User.generate(User.find(params[:id]))
+  end
+
+  def destroy
+    u = User.find(params[:id])
+    unless current_user == u
+      head 400 and return
+    end
+    warden.logout
+    u.delete!
+    redirect_to root_path
   end
 end
