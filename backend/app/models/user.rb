@@ -24,7 +24,11 @@ class User < ApplicationRecord
   validate :validate_password, if: :new_record?
 
   def self.authenticate(email, password)
-    self.find_by(email: email, encrypted_password: self.digest(password))
+    self.find_by(
+      email: email,
+      encrypted_password: self.digest(password),
+      is_available: true,
+    )
   end
 
   def password=(value)

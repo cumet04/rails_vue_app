@@ -11,6 +11,7 @@ gem "mysql2"
 gem "redis-actionpack"
 
 gem "warden"
+gem "cancancan"
 
 group :development do
   gem "dotenv-rails"

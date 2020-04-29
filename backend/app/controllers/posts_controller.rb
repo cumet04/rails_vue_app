@@ -1,6 +1,7 @@
 class PostsController < ApplicationController
   def index
-    page_props[:posts] = Post.available.map { |p| ViewData::Post.generate(p) }
+    page_props[:posts] = Post.accessible_by(current_ability)
+      .map { |p| ViewData::Post.generate(p) }
   end
 
   def create
@@ -19,14 +20,14 @@ class PostsController < ApplicationController
   end
 
   def show
-    page_props[:post] = ViewData::Post.generate(Post.find(params[:id]))
+    page_props[:post] = ViewData::Post.generate(
+      Post.accessible_by(current_ability).find(params[:id])
+    )
   end
 
   def destroy
     post = Post.find(params[:id])
-    unless post.author == current_user
-      head 400 and return
-    end
+    authorize! :edit, post
 
     post.delete!
     redirect_to posts_path

@@ -1,11 +1,12 @@
 class UsersController < ApplicationController
   def index
-    page_props[:users] = User.available.map { |u| ViewData::User.generate(u) }
+    page_props[:users] = User.accessible_by(current_ability)
+      .map { |u| ViewData::User.generate(u) }
   end
 
   def create
-    u = User.create!(email: params[:email], password: params[:password])
-    warden.set_user(u)
+    user = User.create!(email: params[:email], password: params[:password])
+    warden.set_user(user)
     redirect_to root_path
   end
 
@@ -13,16 +14,17 @@ class UsersController < ApplicationController
   end
 
   def show
-    page_props[:user] = ViewData::User.generate(User.find(params[:id]))
+    page_props[:user] = ViewData::User.generate(
+      User.accessible_by(current_ability).find(params[:id])
+    )
   end
 
   def destroy
-    u = User.find(params[:id])
-    unless current_user == u
-      head 400 and return
-    end
+    user = User.find(params[:id])
+    authorize! :edit, user
+
     warden.logout
-    u.delete!
+    user.delete!
     redirect_to root_path
   end
 end
