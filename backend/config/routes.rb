@@ -5,10 +5,24 @@ Rails.application.routes.draw do
   post "login" => "session#create"
   delete "logout" => "session#destroy"
 
-  resource :users
+  resources :users
 
   get "nested" => "nested#index"
   get "nested/some" => "nested#some"
 
   get "*path" => "application#render_404"
 end
+
+# memonize routing map
+Rails.application.config._routing_map =
+  Rails.application.routes.routes
+    .map { |r|
+    ActionDispatch::Routing::RouteWrapper.new(r)
+  }
+    .reject(&:internal?)
+    .to_h { |r|
+    [
+      r.endpoint,
+      r.path.gsub("(.:format)", "").gsub(":", "_"),
+    ]
+  }

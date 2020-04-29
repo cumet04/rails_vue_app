@@ -6,7 +6,7 @@
     <%= csp_meta_tag %>
     <script type="text/javascript">
       window._application = {
-        path: "<%= request.fullpath %>",
+        path: "<%= view_uri %>",
         props: JSON.parse('<%= prop_data_json %>')
       }
     </script>

@@ -3,6 +3,11 @@ module ApplicationHelper
     "#{Rails.application.config.assets_path}/#{path}"
   end
 
+  def view_uri
+    key = "#{params[:controller]}##{params[:action]}"
+    Rails.application.config._routing_map[key]
+  end
+
   def prop_data_json
     raw(JSON.generate(@_view_props || {}))
   end
