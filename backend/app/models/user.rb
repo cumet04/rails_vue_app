@@ -16,10 +16,10 @@
 #
 
 class User < ApplicationRecord
+  include Deletable
+
   validates :email, presence: true
   validate :validate_password, if: :new_record?
-
-  scope(:available, ->() { self.where(is_available: true) })
 
   def self.authenticate(email, password)
     self.find_by(email: email, encrypted_password: self.digest(password))
@@ -28,10 +28,6 @@ class User < ApplicationRecord
   def password=(value)
     @password = value
     self.encrypted_password = self.class.digest(value)
-  end
-
-  def delete!
-    self.update!(deleted_at: Time.zone.now) if self.deleted_at.nil?
   end
 
   private

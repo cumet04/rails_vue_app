@@ -21,4 +21,5 @@
 #  fk_rails_...  (author_id => users.id)
 #
 class Post < ApplicationRecord
+  include Deletable
 end
