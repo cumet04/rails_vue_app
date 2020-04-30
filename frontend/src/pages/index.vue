@@ -1,5 +1,5 @@
 <template>
-  <main class="main">
+  <main>
     <h1>micro posts</h1>
     <div class="container">
       <article class="article">
@@ -47,12 +47,6 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.main {
-  max-width: 800px;
-  margin-left: auto;
-  margin-right: auto;
-}
-
 .container {
   display: flex;
 }

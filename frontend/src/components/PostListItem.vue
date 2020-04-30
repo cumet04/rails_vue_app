@@ -4,7 +4,7 @@
       <a :href="`/posts/${post.id}`" class="title">
         {{ post.title }}
       </a>
-      <small class="info">
+      <div class="info">
         <span class="info_author">
           by
           <a :href="`/users/${post.author.id}`" class="author_name">
@@ -12,7 +12,7 @@
           </a>
         </span>
         <span class="info_when">{{ when }}</span>
-      </small>
+      </div>
     </li>
   </div>
 </template>
@@ -49,7 +49,7 @@ export default {
 }
 
 .info {
-  display: block;
+  font-size: 1.3rem;
   color: gray;
 
   .author_name {

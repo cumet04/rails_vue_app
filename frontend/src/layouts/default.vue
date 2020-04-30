@@ -2,7 +2,9 @@
   <div class="layout_root">
     <the-header :user="ViewProps.currentUser"></the-header>
     <div class="spacer"></div>
-    <Page :props="ViewProps"></Page>
+    <div class="page_wrapper">
+      <Page :props="ViewProps"></Page>
+    </div>
   </div>
 </template>
 
@@ -29,5 +31,11 @@ export default {
 
 .spacer {
   height: 20px;
+}
+
+.page_wrapper {
+  max-width: 800px;
+  margin-left: auto;
+  margin-right: auto;
 }
 </style>
