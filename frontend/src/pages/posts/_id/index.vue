@@ -19,7 +19,10 @@
         </div>
       </header>
       <section>
-        {{ props.post.content }}
+        <template v-for="(line, i) in contentLines">
+          <br v-if="line.match(/^\s*$/)" :key="i" />
+          <p v-else :key="i">{{ line }}</p>
+        </template>
       </section>
     </article>
   </main>
@@ -37,6 +40,9 @@ export default {
     },
     publishedAt() {
       return new Date(Date.parse(this.post.createdAt)).toLocaleDateString();
+    },
+    contentLines() {
+      return this.post.content.split("\n");
     },
   },
 };
