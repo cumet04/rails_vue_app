@@ -1,9 +1,7 @@
 <template>
   <main>
     <h1>Edit post</h1>
-    <form :action="`/posts/${post.id}`" method="post">
-      <csrf-token-input></csrf-token-input>
-      <input type="hidden" name="_method" value="put" />
+    <rails-form :action="`/posts/${post.id}`" method="put">
       <div class="form-field">
         <label>
           title
@@ -17,7 +15,7 @@
         </label>
       </div>
       <button type="submit">post</button>
-    </form>
+    </rails-form>
   </main>
 </template>
 

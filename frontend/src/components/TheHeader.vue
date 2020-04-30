@@ -5,16 +5,12 @@
     <div class="login">
       <template v-if="user">
         <div class="user_name">login: {{ user.email }}</div>
-        <form action="logout" method="post">
-          <csrf-token-input></csrf-token-input>
-          <input type="hidden" name="_method" value="delete" />
+        <rails-form action="/logout" method="delete">
           <button type="submit">logout</button>
-        </form>
-        <form :action="`users/${user.id}`" method="post">
-          <csrf-token-input></csrf-token-input>
-          <input type="hidden" name="_method" value="delete" />
+        </rails-form>
+        <rails-form :action="`users/${user.id}`" method="delete">
           <button type="submit">unregister</button>
-        </form>
+        </rails-form>
       </template>
       <template v-else>
         <a href="/login">login</a>

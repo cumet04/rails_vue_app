@@ -1,7 +1,6 @@
 <template>
   <main>
-    <form method="post">
-      <csrf-token-input></csrf-token-input>
+    <rails-form method="post">
       <div class="form-field">
         <label>
           email
@@ -15,7 +14,7 @@
         </label>
       </div>
       <button type="submit">login</button>
-    </form>
+    </rails-form>
     <p>
       New user ?
       <a href="/users/new">signup</a>
