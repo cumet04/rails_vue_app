@@ -4,10 +4,13 @@
     <title>RailsVue</title>
     <%= csrf_meta_tags %>
     <%= csp_meta_tag %>
+    <script id="page_prop_data" type="text/plain">
+      <%= prop_data_json %>
+    </script>
     <script type="text/javascript">
       window._application = {
         path: "<%= view_uri %>",
-        props: JSON.parse('<%= prop_data_json %>')
+        props: JSON.parse(document.head.children["page_prop_data"].innerText)
       }
     </script>
   </head>

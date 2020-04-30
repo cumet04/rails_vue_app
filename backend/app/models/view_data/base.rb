@@ -10,9 +10,4 @@ class ViewData::Base
   def self.generate_nullable(obj)
     obj && generate(obj)
   end
-
-  def to_json(args)
-    # tmp
-    self.as_json.to_json
-  end
 end
