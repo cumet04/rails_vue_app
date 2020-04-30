@@ -1,22 +1,22 @@
 <template>
   <main>
     <h1>Create new post</h1>
-    <form action="/posts" method="post">
-      <csrf-token-input></csrf-token-input>
-      <div class="form-field">
-        <label>
-          title
-          <input type="text" name="title" />
-        </label>
+    <rails-form class="form" action="/posts" method="post">
+      <input
+        class="input input_line"
+        type="text"
+        name="title"
+        placeholder="Awesome post title"
+      />
+      <textarea
+        class="input input_area"
+        name="content"
+        placeholder="Awesome post content"
+      ></textarea>
+      <div class="button_area">
+        <button class="button" type="submit">POST</button>
       </div>
-      <div class="form-field">
-        <label>
-          content
-          <textarea name="content"></textarea>
-        </label>
-      </div>
-      <button type="submit">post</button>
-    </form>
+    </rails-form>
   </main>
 </template>
 
@@ -25,12 +25,36 @@ export default {};
 </script>
 
 <style lang="scss" scoped>
-input,
-textarea {
-  border: black solid 1px;
+.form {
+  background-color: white;
+  padding: 16px;
 }
 
-button {
-  background-color: lightgrey;
+.input {
+  display: block;
+  width: 100%;
+  margin-bottom: 20px;
+  padding: 5px;
+
+  &_line {
+    border-bottom: lightgray solid 1px;
+  }
+
+  &_area {
+    resize: none;
+    height: 500px;
+    border: lightgray solid 1px;
+  }
+}
+
+.button {
+  background-color: lightblue;
+  padding: 5px 15px;
+  font-size: 1.8rem;
+
+  &_area {
+    display: flex;
+    justify-content: flex-end;
+  }
 }
 </style>
