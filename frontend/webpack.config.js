@@ -4,7 +4,7 @@ const VueLoaderPlugin = require("vue-loader/lib/plugin");
 const port = process.env.PORT || 8080;
 
 module.exports = {
-  entry: "./src/index.js",
+  entry: ["./src/index.js", "./assets/css/common.scss"],
   output: {
     path: path.resolve(__dirname, "../backend/public/assets"),
     filename: "bundle.js",
@@ -32,19 +32,7 @@ module.exports = {
       },
       {
         test: /\.scss$/,
-        use: [
-          "vue-style-loader",
-          "css-loader",
-          {
-            loader: "sass-loader",
-            options: {
-              prependData: `@import "${path.resolve(
-                __dirname,
-                "assets/css/common"
-              )}";`,
-            },
-          },
-        ],
+        use: ["vue-style-loader", "css-loader", "sass-loader"],
       },
     ],
   },
