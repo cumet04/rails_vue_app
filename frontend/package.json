@@ -23,6 +23,7 @@
     "ress": "^2.0.4",
     "sass-loader": "^8.0.2",
     "terser-webpack-plugin": "^2.3.5",
+    "timeago.js": "^4.0.2",
     "vue": "^2.6.11",
     "vue-loader": "^15.9.1",
     "vue-style-loader": "^4.1.2",

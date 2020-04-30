@@ -1,6 +1,7 @@
 <template>
-  <div>
+  <div class="layout_root">
     <the-header :user="ViewProps.currentUser"></the-header>
+    <div class="spacer"></div>
     <Page :props="ViewProps"></Page>
   </div>
 </template>
@@ -19,3 +20,14 @@ export default {
   }),
 };
 </script>
+
+<style lang="scss" scoped>
+.layout_root {
+  min-height: 100vh;
+  background-color: #eee;
+}
+
+.spacer {
+  height: 20px;
+}
+</style>
