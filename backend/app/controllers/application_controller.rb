@@ -1,16 +1,11 @@
 class ApplicationController < ActionController::Base
   before_action do
-    view_props[:user] = ViewData::User.generate_nullable(current_user)
+    view_props[:currentUser] = ViewData::User.generate_nullable(current_user)
   end
 
   ### helpers
   def view_props
     @_view_props ||= {}
-  end
-
-  def page_props
-    # This key is read in frontend layout file
-    view_props[:pageProps] ||= {}
   end
 
   def warden

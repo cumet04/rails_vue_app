@@ -1,6 +1,6 @@
 class UsersController < ApplicationController
   def index
-    page_props[:users] = User.accessible_by(current_ability)
+    view_props[:users] = User.accessible_by(current_ability)
       .map { |u| ViewData::User.generate(u) }
   end
 
@@ -14,7 +14,7 @@ class UsersController < ApplicationController
   end
 
   def show
-    page_props[:user] = ViewData::User.generate(
+    view_props[:user] = ViewData::User.generate(
       User.accessible_by(current_ability).find(params[:id])
     )
   end

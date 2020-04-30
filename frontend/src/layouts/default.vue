@@ -1,7 +1,7 @@
 <template>
   <div>
-    <the-header :user="ViewProps.user"></the-header>
-    <Page :props="ViewProps.pageProps"></Page>
+    <the-header :user="ViewProps.currentUser"></the-header>
+    <Page :props="ViewProps"></Page>
   </div>
 </template>
 
