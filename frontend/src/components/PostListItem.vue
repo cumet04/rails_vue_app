@@ -5,9 +5,9 @@
         {{ post.title }}
       </a>
       <div class="info">
-        <span class="info_author">
+        <span>
           by
-          <a :href="`/users/${post.author.id}`" class="author_name">
+          <a :href="`/users/${post.author.id}`">
             {{ post.author.email }}
           </a>
         </span>
@@ -40,26 +40,11 @@ export default {
   font-size: 1.8rem;
   display: block;
   margin: 0;
-  color: inherit;
-  text-decoration: none;
-
-  &:hover {
-    text-decoration: underline;
-  }
 }
 
 .info {
   font-size: 1.3rem;
   color: gray;
-
-  .author_name {
-    color: inherit;
-    text-decoration: none;
-
-    &:hover {
-      text-decoration: underline;
-    }
-  }
 
   &_when {
     margin-left: 0.5rem;

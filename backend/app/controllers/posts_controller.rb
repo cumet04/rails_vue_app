@@ -18,6 +18,23 @@ class PostsController < ApplicationController
   def new
   end
 
+  def edit
+    post = Post.find(params[:id])
+    authorize! :edit, post
+    view_props[:post] = post
+  end
+
+  def update
+    post = Post.find(params[:id])
+    authorize! :edit, post
+
+    post.update!(
+      title: params[:title],
+      content: params[:content],
+    )
+    redirect_to post_path(post)
+  end
+
   def show
     view_props[:post] = Post.accessible_by(current_ability)
       .find(params[:id]).view_data
