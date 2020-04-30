@@ -36,6 +36,10 @@ class User < ApplicationRecord
     self.encrypted_password = self.class.digest(value)
   end
 
+  def view_data
+    ViewData::User.generate(self)
+  end
+
   private
 
   def validate_password

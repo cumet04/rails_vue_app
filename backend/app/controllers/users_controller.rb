@@ -1,7 +1,6 @@
 class UsersController < ApplicationController
   def index
-    view_props[:users] = User.accessible_by(current_ability)
-      .map { |u| ViewData::User.generate(u) }
+    view_props[:users] = User.accessible_by(current_ability).map(&:view_data)
   end
 
   def create
@@ -14,9 +13,8 @@ class UsersController < ApplicationController
   end
 
   def show
-    view_props[:user] = ViewData::User.generate(
-      User.accessible_by(current_ability).find(params[:id])
-    )
+    view_props[:user] = User.accessible_by(current_ability)
+      .find(params[:id]).view_data
   end
 
   def destroy

@@ -1,7 +1,6 @@
 class PostsController < ApplicationController
   def index
-    view_props[:posts] = Post.accessible_by(current_ability)
-      .map { |p| ViewData::Post.generate(p) }
+    view_props[:posts] = Post.accessible_by(current_ability).map(&:view_data)
   end
 
   def create
@@ -20,9 +19,8 @@ class PostsController < ApplicationController
   end
 
   def show
-    view_props[:post] = ViewData::Post.generate(
-      Post.accessible_by(current_ability).find(params[:id])
-    )
+    view_props[:post] = Post.accessible_by(current_ability)
+      .find(params[:id]).view_data
   end
 
   def destroy

@@ -26,4 +26,8 @@ class Post < ApplicationRecord
   belongs_to :author, class_name: User.name
 
   validates :title, presence: true
+
+  def view_data
+    ViewData::Post.generate(self)
+  end
 end
