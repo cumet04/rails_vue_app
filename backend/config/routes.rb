@@ -6,7 +6,11 @@ Rails.application.routes.draw do
     post "login" => "session#create"
     delete "logout" => "session#destroy"
 
-    resources :users
+    resource "users/current",
+             as: :current_user,
+             controller: :current_user,
+             only: [:edit, :show, :update, :destroy]
+    resources :users, only: [:index, :create, :new, :show]
     resources :posts
 
     get "*path" => "application#render_404"

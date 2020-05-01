@@ -8,7 +8,7 @@
         <rails-form action="/logout" method="delete">
           <button type="submit">logout</button>
         </rails-form>
-        <rails-form :action="`users/${user.id}`" method="delete">
+        <rails-form :action="`users/current`" method="delete">
           <button type="submit">unregister</button>
         </rails-form>
       </template>
