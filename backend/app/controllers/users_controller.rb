@@ -4,7 +4,11 @@ class UsersController < ApplicationController
   end
 
   def create
-    user = User.create!(email: params[:email], password: params[:password])
+    user = User.create!(
+      email: params[:email],
+      password: params[:password],
+      name: params[:name],
+    )
     warden.set_user(user)
     redirect_to root_path
   end

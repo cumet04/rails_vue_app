@@ -7,6 +7,7 @@
 #  email              :string(255)      not null
 #  encrypted_password :string(255)      not null
 #  is_available       :boolean
+#  name               :string(255)      not null
 #  created_at         :datetime         not null
 #  updated_at         :datetime         not null
 #
@@ -22,6 +23,7 @@ class User < ApplicationRecord
 
   validates :email, presence: true
   validate :validate_password, if: :new_record?
+  validates :name, presence: true
 
   def self.authenticate(email, password)
     self.find_by(

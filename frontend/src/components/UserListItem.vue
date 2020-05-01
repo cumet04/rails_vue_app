@@ -2,7 +2,7 @@
   <div>
     <li class="contents">
       <a :href="`/users/${user.id}`" class="name">
-        {{ user.email }}
+        {{ user.name }}
       </a>
     </li>
   </div>

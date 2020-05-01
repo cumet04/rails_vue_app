@@ -8,7 +8,7 @@
         <span>
           by
           <a :href="`/users/${post.author.id}`">
-            {{ post.author.email }}
+            {{ post.author.name }}
           </a>
         </span>
         <span class="info_when">{{ when }}</span>

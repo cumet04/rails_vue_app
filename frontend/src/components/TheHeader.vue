@@ -4,7 +4,7 @@
     <div class="spacer"></div>
     <div class="login">
       <template v-if="user">
-        <div class="user_name">login: {{ user.email }}</div>
+        <div class="user_name">login: {{ user.name }}</div>
         <rails-form action="/logout" method="delete">
           <button type="submit">logout</button>
         </rails-form>
