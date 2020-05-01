@@ -17,9 +17,11 @@
 #
 
 one:
-  email: MyString
+  email: MyString1
+  name: MyName
   encrypted_password: MyString
 
 two:
-  email: MyString
+  email: MyString2
+  name: MyName
   encrypted_password: MyString

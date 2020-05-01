@@ -14,8 +14,11 @@ gem "redis-actionpack"
 gem "warden"
 gem "cancancan"
 
-group :development do
+group :development, :test do
   gem "dotenv-rails"
+end
+
+group :development do
   gem "annotate"
 
   gem "pry-byebug"

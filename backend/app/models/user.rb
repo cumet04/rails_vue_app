@@ -45,9 +45,11 @@ class User < ApplicationRecord
   private
 
   def validate_password
-    # TODO: impl
-    if @password.length < 8
+    unless PasswordValidator.long_enough?(@password)
       errors.add(:password, ": too short")
+    end
+    unless PasswordValidator.contains_char_types?(@password)
+      errors.add(:password, ": not enough character type")
     end
   end
 

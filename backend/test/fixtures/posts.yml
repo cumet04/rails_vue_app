@@ -24,9 +24,9 @@
 one:
   title: MyString
   content: MyText
-  user: 
+  author: one
 
 two:
   title: MyString
   content: MyText
-  user: 
+  author: two
