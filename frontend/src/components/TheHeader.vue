@@ -2,22 +2,26 @@
   <header>
     <div class="title">Application</div>
     <div class="spacer"></div>
-    <div class="login">
+    <div class="account">
       <template v-if="user">
-        <div class="user">
+        <div class="user" @click="menuOpen">
           <img
             class="user_icon"
             :src="imageUrl('ico-account.svg')"
             alt="account"
           />
-          {{ user.name }}
+          <div class="user_name">
+            {{ user.name }}
+          </div>
         </div>
-        <rails-form action="/logout" method="delete">
-          <button type="submit">logout</button>
-        </rails-form>
-        <rails-form :action="`users/current`" method="delete">
-          <button type="submit">unregister</button>
-        </rails-form>
+        <div class="account_menu" v-if="isMenuOpen">
+          <rails-form :action="`users/current`" method="delete">
+            <button type="submit">unregister</button>
+          </rails-form>
+          <rails-form action="/logout" method="delete">
+            <button type="submit">logout</button>
+          </rails-form>
+        </div>
       </template>
       <template v-else>
         <a href="/login">login</a>
@@ -29,6 +33,26 @@
 <script>
 export default {
   props: ["user"],
+  data: () => ({
+    isMenuOpen: false,
+    _removeEvent: null,
+  }),
+  methods: {
+    menuOpen() {
+      this.isMenuOpen = !this.isMenuOpen;
+
+      const closeFunc = function (e) {
+        if (!this.$el.contains(e.target)) {
+          this.isMenuOpen = false;
+          this._removeEvent();
+        }
+      }.bind(this);
+      window.addEventListener("click", closeFunc);
+      this._removeEvent = () => {
+        window.removeEventListener("click", closeFunc);
+      };
+    },
+  },
 };
 </script>
 
@@ -43,8 +67,24 @@ header {
   flex-grow: 1;
 }
 
-.user_icon {
-  width: 20px;
-  height: 20px;
+.account {
+  position: relative;
+
+  &_menu {
+    position: absolute;
+    right: 0;
+    border: gray solid 1px;
+    background-color: white;
+    padding: 5px;
+  }
+}
+
+.user {
+  display: flex;
+  &_icon {
+    width: 20px;
+    height: 20px;
+    margin-right: 5px;
+  }
 }
 </style>
