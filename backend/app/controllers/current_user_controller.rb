@@ -1,6 +1,11 @@
 class CurrentUserController < ApplicationController
+  before_action do
+    redirect_to login_path unless current_user
+  end
+
   def show
     view_props[:user] = current_user.view_data
+    view_props[:posts] = current_user.posts.map(&:view_data)
   end
 
   def edit
@@ -9,9 +14,8 @@ class CurrentUserController < ApplicationController
 
   def update
     editable_user.update!(
-      email: params[:email],
-      password: params[:password],
       name: params[:name],
+      biography: params[:biography],
     )
     redirect_to current_user_path
   end

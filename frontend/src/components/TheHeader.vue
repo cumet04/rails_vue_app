@@ -15,12 +15,21 @@
           </div>
         </div>
         <div class="account_menu" v-if="isMenuOpen">
-          <rails-form :action="`users/current`" method="delete">
-            <button type="submit">unregister</button>
-          </rails-form>
-          <rails-form action="/logout" method="delete">
-            <button type="submit">logout</button>
-          </rails-form>
+          <ul class="account_menu_list">
+            <li class="menu_item">
+              <a href="/users/current">my profile</a>
+            </li>
+            <li>
+              <rails-form :action="`users/current`" method="delete">
+                <button type="submit">unregister</button>
+              </rails-form>
+            </li>
+            <li>
+              <rails-form action="/logout" method="delete">
+                <button type="submit">logout</button>
+              </rails-form>
+            </li>
+          </ul>
         </div>
       </template>
       <template v-else>
