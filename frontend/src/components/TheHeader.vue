@@ -4,7 +4,14 @@
     <div class="spacer"></div>
     <div class="login">
       <template v-if="user">
-        <div class="user_name">login: {{ user.name }}</div>
+        <div class="user">
+          <img
+            class="user_icon"
+            :src="imageUrl('ico-account.svg')"
+            alt="account"
+          />
+          {{ user.name }}
+        </div>
         <rails-form action="/logout" method="delete">
           <button type="submit">logout</button>
         </rails-form>
@@ -29,9 +36,15 @@ export default {
 header {
   display: flex;
   background-color: lightblue;
+  padding: 8px;
 }
 
 .spacer {
   flex-grow: 1;
+}
+
+.user_icon {
+  width: 20px;
+  height: 20px;
 }
 </style>

@@ -1,12 +1,14 @@
+const webpack = require("webpack");
 const path = require("path");
 const VueLoaderPlugin = require("vue-loader/lib/plugin");
 
 const port = process.env.PORT || 8080;
+const assets_path = "/assets";
 
 module.exports = {
-  entry: ["./src/index.js", "./assets/css/common.scss"],
+  entry: ["./src/index.js", "./src/assets/css/common.scss"],
   output: {
-    path: path.resolve(__dirname, "../backend/public/assets"),
+    path: path.resolve(__dirname, `../backend/public${assets_path}`),
     filename: "bundle.js",
   },
   mode: "production",
@@ -34,6 +36,17 @@ module.exports = {
         test: /\.scss$/,
         use: ["vue-style-loader", "css-loader", "sass-loader"],
       },
+      {
+        test: /\.svg$/,
+        use: [
+          {
+            loader: "file-loader",
+            options: {
+              esModule: false,
+            },
+          },
+        ],
+      },
     ],
   },
   resolve: {
@@ -43,5 +56,13 @@ module.exports = {
       "~": path.resolve(__dirname, "src"),
     },
   },
-  plugins: [new VueLoaderPlugin()],
+  plugins: [
+    new VueLoaderPlugin(),
+    new webpack.DefinePlugin({
+      ASSETS_PATH:
+        process.env.NODE_ENV == "development"
+          ? JSON.stringify(`http://localhost:${port}`)
+          : JSON.stringify(assets_path),
+    }),
+  ],
 };
