@@ -1,6 +1,8 @@
 <template>
   <header>
-    <div class="title">Application</div>
+    <div class="title">
+      <a href="/">Application</a>
+    </div>
     <div class="spacer"></div>
     <div class="account">
       <template v-if="user">
