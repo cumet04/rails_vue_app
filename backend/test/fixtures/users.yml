@@ -3,6 +3,7 @@
 # Table name: users
 #
 #  id                 :bigint           not null, primary key
+#  biography          :text(65535)
 #  deleted_at         :datetime
 #  email              :string(255)      not null
 #  encrypted_password :string(255)      not null

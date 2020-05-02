@@ -13,6 +13,7 @@ class UsersController < ApplicationController
       email: params[:email],
       password: params[:password],
       name: params[:name],
+      biography: params[:biography],
     )
     warden.set_user(user)
     redirect_to root_path

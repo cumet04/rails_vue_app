@@ -81,6 +81,8 @@ header {
 
 .user {
   display: flex;
+  cursor: pointer;
+
   &_icon {
     width: 20px;
     height: 20px;

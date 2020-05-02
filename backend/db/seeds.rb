@@ -5,10 +5,14 @@ Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deseru
 "
 
 (1..5).each { |i|
-  User.create!(name: "user#{i}", email: "user#{i}@a.b.c", password: "Password0")
-    .posts.create!(
-      title: "user#{i}'s post",
-      content: dummy_content,
-    )
+  User.create!(
+    email: "user#{i}@a.b.c",
+    password: "Password0",
+    name: "user#{i}",
+    biography: "My name is user#{i}",
+  ).posts.create!(
+    title: "user#{i}'s post",
+    content: dummy_content,
+  )
 }
 User.second.delete!

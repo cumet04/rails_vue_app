@@ -28,6 +28,7 @@ ActiveRecord::Schema.define(version: 2020_04_29_210508) do
     t.string "email", null: false
     t.string "encrypted_password", null: false
     t.string "name", null: false
+    t.text "biography"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
     t.datetime "deleted_at"

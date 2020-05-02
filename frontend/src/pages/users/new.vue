@@ -5,12 +5,6 @@
       <input
         class="input input_line"
         type="text"
-        name="name"
-        placeholder="Your name for display"
-      />
-      <input
-        class="input input_line"
-        type="text"
         name="email"
         placeholder="Email"
       />
@@ -20,6 +14,17 @@
         name="password"
         placeholder="Password"
       />
+      <input
+        class="input input_line"
+        type="text"
+        name="name"
+        placeholder="Your name for display"
+      />
+      <textarea
+        class="input input_area"
+        name="biography"
+        placeholder="Introduce yourself (optional)"
+      ></textarea>
       <div class="button_area">
         <button class="button" type="submit">SIGN UP</button>
       </div>
@@ -45,6 +50,12 @@ export default {};
 
   &_line {
     border-bottom: lightgray solid 1px;
+  }
+
+  &_area {
+    resize: none;
+    height: 100px;
+    border: lightgray solid 1px;
   }
 }
 
