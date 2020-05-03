@@ -1,6 +1,6 @@
 # -*- mode: ruby -*-
 # vi: set ft=ruby :
-create_table "posts", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+create_table "posts", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4", force: :cascade do |t|
   t.string "title", null: false
   t.text "content"
   t.bigint "author_id", null: false
@@ -12,7 +12,7 @@ create_table "posts", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cas
   t.index ["title"], name: "index_posts_on_title"
 end
 
-create_table "users", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+create_table "users", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4", force: :cascade do |t|
   t.string "email", null: false
   t.string "encrypted_password", null: false
   t.string "name", null: false
