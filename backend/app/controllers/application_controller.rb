@@ -16,6 +16,12 @@ class ApplicationController < ActionController::Base
     warden.user
   end
 
+  # shorthand of "klass.accessible_by(current_ability).available"
+  def accessible(klass)
+    scope = klass.accessible_by(current_ability)
+    scope.respond_to?(:available) ? scope.available : scope
+  end
+
   # override ActionController::ImplicitRender for omitting view file per action
   def default_render
     render(html: "", layout: true)

@@ -1,11 +1,10 @@
 class UsersController < ApplicationController
   def index
-    view_props[:users] = User.accessible_by(current_ability).map(&:view_data)
+    view_props[:users] = accessible(User).map(&:view_data)
   end
 
   def show
-    view_props[:user] = User.accessible_by(current_ability)
-      .find(params[:id]).view_data
+    view_props[:user] = accessible(User).find(params[:id]).view_data
   end
 
   def create

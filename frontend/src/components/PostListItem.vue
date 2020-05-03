@@ -7,9 +7,12 @@
       <div class="info">
         <span>
           by
-          <a :href="`/users/${post.author.id}`">
+          <a :href="`/users/${post.author.id}`" v-if="post.author.id != null">
             {{ post.author.name }}
           </a>
+          <template v-else>
+            {{ post.author.name }}
+          </template>
         </span>
         <span class="info_when">{{ when }}</span>
       </div>

@@ -2,6 +2,10 @@ module Deletable
   extend ActiveSupport::Concern
 
   included do
+    scope(:available, ->() {
+      where(is_available: true)
+    })
+
     def available?
       !!self.is_available
     end

@@ -1,6 +1,6 @@
 class PostsController < ApplicationController
   def index
-    view_props[:posts] = Post.accessible_by(current_ability).map(&:view_data)
+    view_props[:posts] = accessible(Post).map(&:view_data)
   end
 
   def create
@@ -19,15 +19,11 @@ class PostsController < ApplicationController
   end
 
   def edit
-    post = Post.find(params[:id])
-    authorize! :edit, post
-    view_props[:post] = post
+    view_props[:post] = editable_post.view_data
   end
 
   def update
-    post = Post.find(params[:id])
-    authorize! :edit, post
-
+    post = editable_post
     post.update!(
       title: params[:title],
       content: params[:content],
@@ -36,15 +32,19 @@ class PostsController < ApplicationController
   end
 
   def show
-    view_props[:post] = Post.accessible_by(current_ability)
-      .find(params[:id]).view_data
+    view_props[:post] = accessible(Post).find(params[:id]).view_data
   end
 
   def destroy
+    editable_post.delete!
+    redirect_to posts_path
+  end
+
+  private
+
+  def editable_post
     post = Post.find(params[:id])
     authorize! :edit, post
-
-    post.delete!
-    redirect_to posts_path
+    post
   end
 end
