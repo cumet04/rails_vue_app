@@ -1,16 +1,19 @@
 <template>
   <main>
     <article class="article">
-      <header class="header">
-        <div class="header_content">
-          <h1 class="title">{{ post.title }}</h1>
-          <div class="info">
+      <header class="article_header">
+        <div class="article_header_content">
+          <h1 class="article_title">{{ post.title }}</h1>
+          <div class="article_info">
             <div>
               by
-              <a :href="`/users/${post.author.id}`">
-                {{ post.author.email }}
+              <a :href="`/users/${author.id}`" v-if="author.id != null">
+                {{ author.name }}
               </a>
-              , published at {{ publishedAt }}
+              <template v-else>
+                {{ author.name }}
+              </template>
+              , published at {{ timestamp(post.createdAt) }}
             </div>
             <div class="edit_link" v-if="isMyPost">
               <a :href="`/posts/${post.id}/edit`">edit</a>
@@ -25,24 +28,47 @@
         </template>
       </section>
     </article>
+    <div class="spacer"></div>
+    <aside class="comments">
+      <h2>comments</h2>
+      <ol class="comments_list">
+        <comment-list-item
+          v-for="comment in comments"
+          :key="comment.id"
+          :comment="comment"
+        ></comment-list-item>
+      </ol>
+    </aside>
   </main>
 </template>
 
 <script>
+import CommentListItem from "~/components/CommentListItem";
+
 export default {
   props: ["props"],
+  components: {
+    "comment-list-item": CommentListItem,
+  },
+  data() {
+    return {
+      // aliases
+      post: this.props.post,
+      author: this.props.post.author,
+      comments: this.props.post.comments,
+    };
+  },
   computed: {
-    post() {
-      return this.props.post;
-    },
     isMyPost() {
-      return this.post.author.id == this.props.currentUser.id;
-    },
-    publishedAt() {
-      return new Date(Date.parse(this.post.createdAt)).toLocaleDateString();
+      return this.author.id == this.props.currentUser.id;
     },
     contentLines() {
       return this.post.content.split("\n");
+    },
+  },
+  methods: {
+    timestamp(time) {
+      return new Date(Date.parse(time)).toLocaleDateString();
     },
   },
 };
@@ -52,25 +78,34 @@ export default {
 .article {
   background-color: white;
   padding: 10px;
-}
 
-.header {
-  display: flex;
-  margin-bottom: 20px;
+  &_header {
+    display: flex;
+    margin-bottom: 20px;
 
-  &_content {
-    flex-grow: 1;
+    &_content {
+      flex-grow: 1;
+    }
+  }
+
+  &_title {
+    font-size: 3rem;
+  }
+
+  &_info {
+    display: flex;
+    justify-content: space-between;
+    font-size: 1.4rem;
+    color: gray;
   }
 }
 
-.title {
-  font-size: 3rem;
+.spacer {
+  height: 20px;
 }
 
-.info {
-  display: flex;
-  justify-content: space-between;
-  font-size: 1.4rem;
-  color: gray;
+.comments {
+  background-color: white;
+  padding: 10px;
 }
 </style>

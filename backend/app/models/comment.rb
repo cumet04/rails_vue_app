@@ -25,4 +25,8 @@ class Comment < ApplicationRecord
 
   belongs_to :author, class_name: User.name
   belongs_to :post
+
+  def view_data
+    ViewData::Comment.generate(self)
+  end
 end

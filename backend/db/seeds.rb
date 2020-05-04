@@ -4,7 +4,7 @@ Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu 
 Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
 "
 
-(1..5).each { |i|
+(1..5).each do |i|
   User.create!(
     email: "user#{i}@a.b.c",
     password: "Password0",
@@ -14,5 +14,17 @@ Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deseru
     title: "user#{i}'s post",
     content: dummy_content,
   )
-}
+end
+
+Post.all.each.with_index do |post, i|
+  user_count = User.all.count
+  i.times.each do |j|
+    ui = (j % user_count) + 1
+    post.comments.create!(
+      content: "post#{i + 1}'s comment #{j}",
+      author: User.find(ui),
+    )
+  end
+end
+
 User.second.delete!
