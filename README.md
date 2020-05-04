@@ -1,5 +1,7 @@
-# sbox rails vue
-従来の（API + SPAなどではない）形式のRailsアプリケーションでありながらView層を可能な限りVueで書けるかたちにする試み
+# rails vue app
+従来の（API + SPAなどではない）形式のRailsアプリケーションでありながらView層を可能な限りVueで書けるかたちにする試み  
+\+  
+Railsコードスニペット用サンプルアプリケーション
 
 ## やりたいこと
 * View層を（可能な限り）Vue.jsで記述する
