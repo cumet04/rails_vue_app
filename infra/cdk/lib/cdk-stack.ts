@@ -9,7 +9,31 @@ export class CdkStack extends cdk.Stack {
   constructor(scope: cdk.Construct, id: string, props?: cdk.StackProps) {
     super(scope, id, props);
 
-    // --- VPC ---
+    const { vpc, sgALB, sgApp, sgDB, sgRedis, sgRepository } = this.createVpc();
+
+    this.createALB(
+      vpc,
+      sgALB,
+      vpc.selectSubnets({ subnetGroupName: "Ingress" })
+    );
+
+    const repository = this.createECR(
+      vpc,
+      sgRepository,
+      vpc.selectSubnets({ subnetGroupName: "App" })
+    );
+
+    this.createECS(vpc, sgApp, repository);
+  }
+
+  createVpc(): {
+    vpc: ec2.Vpc;
+    sgALB: ec2.SecurityGroup;
+    sgApp: ec2.SecurityGroup;
+    sgDB: ec2.SecurityGroup;
+    sgRedis: ec2.SecurityGroup;
+    sgRepository: ec2.SecurityGroup;
+  } {
     const vpc = new ec2.Vpc(this, "VPC", {
       cidr: "10.0.0.0/24",
       maxAzs: 2,
@@ -45,12 +69,15 @@ export class CdkStack extends cdk.Stack {
     const sgRepository = new ec2.SecurityGroup(this, "sgRepository", { vpc });
     sgRepository.addIngressRule(ec2.Peer.anyIpv4(), ec2.Port.tcp(443));
 
-    // --- ALB ---
+    return { vpc, sgALB, sgApp, sgDB, sgRedis, sgRepository };
+  }
+
+  createALB(vpc: ec2.Vpc, sg: ec2.SecurityGroup, subnets: ec2.SubnetSelection) {
     const alb = new elbv2.ApplicationLoadBalancer(this, "ALB", {
       vpc,
-      vpcSubnets: vpc.selectSubnets({ subnetGroupName: "Ingress" }),
+      vpcSubnets: subnets,
       internetFacing: true,
-      securityGroup: sgALB,
+      securityGroup: sg,
     });
     alb
       .addListener("albListner80", { port: 80 })
@@ -59,15 +86,15 @@ export class CdkStack extends cdk.Stack {
         port: "443",
         statusCode: "HTTP_301",
       });
-
-    const certArnParam = new cdk.CfnParameter(this, "certArnParam", {
-      type: "String",
-      description: "ALB certficate arn",
-    });
     alb
       .addListener("albListner443", {
         port: 443,
-        certificateArns: [certArnParam.valueAsString],
+        certificateArns: [
+          new cdk.CfnParameter(this, "certArnParam", {
+            type: "String",
+            description: "ALB certficate arn",
+          }).valueAsString,
+        ],
       })
       .addTargetGroups("albListener443TargetGroups", {
         targetGroups: [
@@ -80,21 +107,27 @@ export class CdkStack extends cdk.Stack {
           }),
         ],
       });
+  }
 
-    // --- ECR --
+  createECR(
+    vpc: ec2.Vpc,
+    sg: ec2.SecurityGroup,
+    subnets: ec2.SubnetSelection
+  ): ecr.Repository {
     const repository = new ecr.Repository(this, "ecrRepository");
     // For Fargate in isolated subnet, ECR_DOCKER and S3 private endpoint are needed.
     // refs https://docs.aws.amazon.com/AmazonECR/latest/userguide/vpc-endpoints.html
     vpc.addInterfaceEndpoint("vpcEcrEndpoint", {
       service: ec2.InterfaceVpcEndpointAwsService.ECR_DOCKER,
       subnets: vpc.selectSubnets({ subnetGroupName: "App" }),
-      securityGroups: [sgRepository],
+      securityGroups: [sg],
     });
-    vpc.addS3Endpoint("vpcS3Endpoint", [
-      vpc.selectSubnets({ subnetGroupName: "App" }),
-    ]);
+    vpc.addS3Endpoint("vpcS3Endpoint", [subnets]);
 
-    // --- ECS ---
+    return repository;
+  }
+
+  createECS(vpc: ec2.Vpc, sg: ec2.SecurityGroup, repository: ecr.Repository) {
     const cluster = new ecs.Cluster(this, "Cluster", { vpc });
     const taskDefinition = new ecs.TaskDefinition(this, "ecsTaskDef", {
       compatibility: ecs.Compatibility.FARGATE,
@@ -118,7 +151,7 @@ export class CdkStack extends cdk.Stack {
       cluster,
       taskDefinition,
       vpcSubnets: vpc.selectSubnets({ subnetGroupName: "App" }),
-      securityGroup: sgApp,
+      securityGroup: sg,
     });
   }
 }
