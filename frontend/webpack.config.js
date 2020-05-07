@@ -6,7 +6,7 @@ const port = process.env.PORT || 8080;
 const assets_path = "/assets";
 
 module.exports = {
-  entry: ["./src/index.js", "./src/assets/css/common.scss"],
+  entry: ["./src/index.js"],
   output: {
     path: path.resolve(__dirname, `../backend/public${assets_path}`),
     filename: "bundle.js",
@@ -33,8 +33,12 @@ module.exports = {
         loader: "babel-loader",
       },
       {
-        test: /\.scss$/,
-        use: ["vue-style-loader", "css-loader", "sass-loader"],
+        test: /\.css$/,
+        use: ["vue-style-loader", "css-loader"],
+      },
+      {
+        test: /\.postcss$/,
+        use: ["vue-style-loader", "css-loader", "postcss-loader"],
       },
       {
         test: /\.svg$/,

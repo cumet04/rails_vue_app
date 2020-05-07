@@ -12,7 +12,7 @@
         <template v-else>
           {{ comment.author.name }}
         </template>
-        <span class="info_when">{{ when }}</span>
+        <span class="when">{{ when }}</span>
       </div>
       <div class="content">
         {{ comment.content }}
@@ -34,7 +34,7 @@ export default {
 };
 </script>
 
-<style lang="scss" scoped>
+<style lang="postcss" scoped>
 .contents {
   border-top: #ddd solid 1px;
   padding: 8px;
@@ -44,7 +44,7 @@ export default {
   font-size: 1.3rem;
   color: gray;
 
-  &_when {
+  & .when {
     margin-left: 0.5rem;
   }
 }

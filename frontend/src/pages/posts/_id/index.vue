@@ -74,7 +74,7 @@ export default {
 };
 </script>
 
-<style lang="scss" scoped>
+<style lang="postcss" scoped>
 .article {
   background-color: white;
   padding: 10px;

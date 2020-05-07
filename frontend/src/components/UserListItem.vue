@@ -14,7 +14,7 @@ export default {
 };
 </script>
 
-<style lang="scss" scoped>
+<style lang="postcss" scoped>
 .contents {
   border-top: #ddd solid 1px;
   padding: 4px 8px;
