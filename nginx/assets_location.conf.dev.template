@@ -1,0 +1,3 @@
+location ~* /assets/ {
+  proxy_pass http://${ASSETS_HOST}:3000;
+}

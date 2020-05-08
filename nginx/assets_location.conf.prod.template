@@ -1,0 +1,4 @@
+location ~* /assets/ {
+  add_header Cache-Control must-revalidate;
+  expires 1d;
+}

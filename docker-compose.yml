@@ -1,5 +1,49 @@
 version: '3'
 services:
+  nginx:
+    build:
+      context: ./nginx
+      args:
+        - ENV=dev
+        - PUMA_HOST=backend
+        - ASSETS_HOST=frontend
+        - EDGE_PROTO=http
+    ports:
+      - "3000:80"
+    depends_on:
+      - frontend
+      - backend
+    logging:
+      driver: none
+
+  frontend:
+    build:
+      context: ./frontend
+    command: npm run dev
+    volumes:
+      - "./frontend:/app"
+      - /app/node_modules
+    environment:
+      - PORT=3000
+
+  backend:
+    build:
+      context: ./backend
+    volumes:
+      - "./backend:/app"
+      - /app/.bundle
+    environment:
+      - RAILS_DB_HOST=db
+      - RAILS_DB_PORT=3306
+      - RAILS_DB_DATABASE=railsapp
+      - RAILS_DB_USERNAME=root
+      - RAILS_DB_PASSWORD=""
+      - RAILS_REDIS_HOST=redis
+      - RAILS_REDIS_PORT=6379
+    depends_on:
+      - db
+      - redis
+
   db:
     image: mariadb:10.3
     environment:
@@ -7,13 +51,13 @@ services:
       MYSQL_ROOT_HOST: '%'
     volumes:
       - db:/var/lib/mysql
-    ports:
-      - "53306:3306"
+    logging:
+      driver: none
 
   redis:
     image: redis:5.0
-    ports:
-      - "56379:6379"
+    logging:
+      driver: none
 
 volumes:
   db:
