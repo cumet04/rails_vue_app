@@ -26,7 +26,7 @@
 export default {};
 </script>
 
-<style lang="scss" scoped>
+<style lang="postcss" scoped>
 input {
   border: black solid 1px;
 }

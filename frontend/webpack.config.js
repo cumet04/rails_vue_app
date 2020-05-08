@@ -6,21 +6,18 @@ const port = process.env.PORT || 8080;
 const assets_path = "/assets";
 
 module.exports = {
-  entry: ["./src/index.js", "./src/assets/css/common.scss"],
+  entry: ["./src/index.js"],
   output: {
-    path: path.resolve(__dirname, `../backend/public${assets_path}`),
+    path: path.resolve(__dirname, `../nginx/public${assets_path}`),
     filename: "bundle.js",
   },
   mode: "production",
   devServer: {
     port,
-    contentBase: path.resolve(__dirname, "public"),
-    headers: {
-      "Access-Control-Allow-Origin": "*",
-      "Access-Control-Allow-Methods": "GET",
-      "Access-Control-Allow-Headers":
-        "X-Requested-With, content-type, Authorization",
-    },
+    host: "0.0.0.0",
+    disableHostCheck: true,
+    publicPath: assets_path,
+    sockPath: `${assets_path}/sockjs-node`,
   },
   module: {
     rules: [
@@ -33,8 +30,12 @@ module.exports = {
         loader: "babel-loader",
       },
       {
-        test: /\.scss$/,
-        use: ["vue-style-loader", "css-loader", "sass-loader"],
+        test: /\.css$/,
+        use: ["vue-style-loader", "css-loader"],
+      },
+      {
+        test: /\.postcss$/,
+        use: ["vue-style-loader", "css-loader", "postcss-loader"],
       },
       {
         test: /\.svg$/,
@@ -59,10 +60,7 @@ module.exports = {
   plugins: [
     new VueLoaderPlugin(),
     new webpack.DefinePlugin({
-      ASSETS_PATH:
-        process.env.NODE_ENV == "development"
-          ? JSON.stringify(`http://localhost:${port}`)
-          : JSON.stringify(assets_path),
+      ASSETS_PATH: JSON.stringify(assets_path),
     }),
   ],
 };

@@ -7,17 +7,13 @@
     <div class="account">
       <template v-if="user">
         <div class="user" @click="menuOpen">
-          <img
-            class="user_icon"
-            :src="imageUrl('ico-account.svg')"
-            alt="account"
-          />
+          <img class="icon" :src="imageUrl('ico-account.svg')" alt="account" />
           <div class="user_name">
             {{ user.name }}
           </div>
         </div>
-        <div class="account_menu" v-if="isMenuOpen">
-          <ul class="account_menu_list">
+        <div class="menu" v-if="isMenuOpen">
+          <ul class="menu_list">
             <li class="menu_item">
               <a href="/users/current">my profile</a>
             </li>
@@ -67,7 +63,7 @@ export default {
 };
 </script>
 
-<style lang="scss" scoped>
+<style lang="postcss" scoped>
 header {
   display: flex;
   background-color: lightblue;
@@ -81,7 +77,7 @@ header {
 .account {
   position: relative;
 
-  &_menu {
+  & .menu {
     position: absolute;
     right: 0;
     border: gray solid 1px;
@@ -94,7 +90,7 @@ header {
   display: flex;
   cursor: pointer;
 
-  &_icon {
+  & .icon {
     width: 20px;
     height: 20px;
     margin-right: 5px;

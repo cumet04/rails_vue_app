@@ -42,8 +42,5 @@ module RailsVue
         namespace: "sessions",
       }, expire_in: 3.days, secure: true,
     )
-
-    # application config
-    config.assets_path = ENV.fetch("ASSETS_PATH") # without trailing slash
   end
 end

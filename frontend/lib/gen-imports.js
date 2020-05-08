@@ -8,10 +8,13 @@
 //       index.vue
 //       some.vue
 // ---------- pages.js ----------
+// import _page1 from "/src/pages/index"
+// import _page2 from "/src/pages/nested/index"
+// import _page3 from "/src/pages/nested/some"
 // export let Pages = {
-//   "index": require("./pages/index").default,
-//   "nested": require("./pages/nested/index").default,
-//   "nested/some": require("./pages/nested/some").default,
+//   "index": _page1,
+//   "nested": _page2,
+//   "nested/some": _page3,
 // };
 // ------------------------------
 
@@ -34,7 +37,7 @@ const getFiles = (dirpath, list) => {
 
 function run() {
   console.log("generate pages.js");
-  const output = getFiles("src/pages", [])
+  const mapping = getFiles("src/pages", [])
     .map((path) => {
       return path.replace("src/pages/", "").replace(".vue", "");
     })
@@ -42,11 +45,21 @@ function run() {
       const path = file
         .replace(/\/index/, "") // remove "/index"; normalize
         .replace(/^$/, "index"); // "index" for "/"
-      return `"${path}": require("./pages/${file}").default`;
-    })
-    .join(",");
+      return {
+        path,
+        file: `./pages/${file}.vue`,
+      };
+    });
 
-  fs.writeFileSync("src/pages.js", `export let Pages = {${output}}`);
+  fs.writeFileSync(
+    "src/pages.js",
+    mapping
+      .map((pair, i) => `import _page${i} from "${pair.file}"`)
+      .join("\n") +
+      "\nexport let Pages = {" +
+      mapping.map((pair, i) => `"${pair.path}": _page${i},`).join("\n") +
+      "}"
+  );
 }
 
 module.exports = run;

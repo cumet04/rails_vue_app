@@ -4,6 +4,7 @@ Rails.application.configure do
   config.eager_load = false
   config.consider_all_requests_local = true
   config.public_file_server.enabled = true
+  BetterErrors::Middleware.allow_ip! "0.0.0.0/0"
 
   config.action_controller.perform_caching = false
   config.cache_store = :null_store

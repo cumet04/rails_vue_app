@@ -1,3 +1,6 @@
+import "../node_modules/ress/dist/ress.min.css";
+import "~/assets/css/common.css";
+
 import Vue from "vue";
 import Layout from "~/layouts/default";
 
