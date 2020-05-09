@@ -13,26 +13,27 @@
     "diff": "run-s build && cdk diff"
   },
   "dependencies": {
-    "@aws-cdk/aws-ec2": "^1.37.0",
-    "@aws-cdk/aws-ecr": "^1.37.0",
-    "@aws-cdk/aws-ecs": "^1.37.0",
-    "@aws-cdk/aws-elasticache": "^1.37.0",
-    "@aws-cdk/aws-elasticloadbalancingv2": "^1.37.0",
-    "@aws-cdk/aws-iam": "^1.37.0",
-    "@aws-cdk/aws-rds": "^1.37.0",
-    "@aws-cdk/core": "1.37.0",
-    "source-map-support": "^0.5.16"
+    "@aws-cdk/aws-ec2": "^1.38.0",
+    "@aws-cdk/aws-ecr": "^1.38.0",
+    "@aws-cdk/aws-ecs": "^1.38.0",
+    "@aws-cdk/aws-elasticache": "^1.38.0",
+    "@aws-cdk/aws-elasticloadbalancingv2": "^1.38.0",
+    "@aws-cdk/aws-iam": "^1.38.0",
+    "@aws-cdk/aws-rds": "^1.38.0",
+    "@aws-cdk/aws-ssm": "^1.38.0",
+    "@aws-cdk/core": "1.38.0",
+    "source-map-support": "^0.5.19"
   },
   "devDependencies": {
-    "@aws-cdk/assert": "1.37.0",
+    "@aws-cdk/assert": "1.38.0",
     "@types/jest": "^25.2.1",
-    "@types/node": "10.17.5",
-    "aws-cdk": "1.37.0",
-    "jest": "^25.5.0",
+    "@types/node": "13.13.5",
+    "aws-cdk": "1.38.0",
+    "jest": "^25.5.4",
     "npm-run-all": "^4.1.5",
     "prettier": "^2.0.5",
-    "ts-jest": "^25.3.1",
-    "ts-node": "^8.1.0",
-    "typescript": "~3.7.2"
+    "ts-jest": "^25.5.1",
+    "ts-node": "^8.10.1",
+    "typescript": "~3.8.3"
   }
 }
