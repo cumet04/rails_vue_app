@@ -33,6 +33,7 @@ services:
       - "./backend:/app"
       - /app/.bundle
     environment:
+      - RAILS_ENV=development
       - RAILS_DB_HOST=db
       - RAILS_DB_PORT=3306
       - RAILS_DB_DATABASE=railsapp
