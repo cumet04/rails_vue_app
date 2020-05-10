@@ -6,9 +6,24 @@ import * as ecr from "@aws-cdk/aws-ecr";
 import * as iam from "@aws-cdk/aws-iam";
 import * as elasticache from "@aws-cdk/aws-elasticache";
 import * as rds from "@aws-cdk/aws-rds";
+import * as ssm from "@aws-cdk/aws-ssm";
 
-export class CdkStack extends cdk.Stack {
-  constructor(scope: cdk.Construct, id: string, props?: cdk.StackProps) {
+interface IParams {
+  certArn: string;
+  dbName: string;
+  dbUser: string;
+  dbPassParamName: string;
+  repoName: string;
+  appSecretParamName: string;
+}
+
+export class RailsVue extends cdk.Stack {
+  constructor(
+    scope: cdk.Construct,
+    id: string,
+    params: IParams,
+    props?: cdk.StackProps
+  ) {
     super(scope, id, props);
 
     const {
@@ -20,18 +35,37 @@ export class CdkStack extends cdk.Stack {
       sgApp,
       sgDB,
       sgRedis,
-      sgRepository,
     } = this.createVpc();
 
-    this.createALB(vpc, sgALB, snIngress);
+    const redisHost = this.createRedis(sgRedis, snData);
+    const dbHost = this.createRDS(
+      vpc,
+      sgDB,
+      snData,
+      params.dbUser,
+      params.dbPassParamName,
+      params.dbName
+    );
+    const taskDefinition = this.createTasks(
+      params.repoName,
+      dbHost,
+      params.dbUser,
+      params.dbName,
+      redisHost,
+      params.dbPassParamName,
+      params.appSecretParamName
+    );
 
-    const repository = this.createECR(vpc, sgRepository, snApp);
+    this.createALB(vpc, sgALB, snIngress, params.certArn);
 
-    this.createECS(vpc, sgApp, repository);
-
-    this.createRedis(sgRedis, snData);
-
-    this.createRDS(vpc, sgDB, snData);
+    const cluster = new ecs.Cluster(this, "Cluster", { vpc });
+    new ecs.FargateService(this, "ecsFargateService", {
+      cluster,
+      taskDefinition,
+      vpcSubnets: snApp,
+      securityGroup: sgApp,
+      desiredCount: 0, // There is no ECR image entity on initial deploy
+    });
   }
 
   createVpc(): {
@@ -43,7 +77,6 @@ export class CdkStack extends cdk.Stack {
     sgApp: ec2.SecurityGroup;
     sgDB: ec2.SecurityGroup;
     sgRedis: ec2.SecurityGroup;
-    sgRepository: ec2.SecurityGroup;
   } {
     const vpc = new ec2.Vpc(this, "VPC", {
       cidr: "10.0.0.0/24",
@@ -64,6 +97,12 @@ export class CdkStack extends cdk.Stack {
       ],
     });
 
+    // subnets ---
+    const snIngress = vpc.selectSubnets({ subnetGroupName: "Ingress" });
+    const snApp = vpc.selectSubnets({ subnetGroupName: "App" });
+    const snData = vpc.selectSubnets({ subnetGroupName: "Data" });
+
+    // security groups ---
     const sgALB = new ec2.SecurityGroup(this, "sgALB", { vpc });
     sgALB.addIngressRule(ec2.Peer.anyIpv4(), ec2.Port.tcp(80));
     sgALB.addIngressRule(ec2.Peer.anyIpv4(), ec2.Port.tcp(443));
@@ -80,20 +119,34 @@ export class CdkStack extends cdk.Stack {
     const sgRepository = new ec2.SecurityGroup(this, "sgRepository", { vpc });
     sgRepository.addIngressRule(ec2.Peer.anyIpv4(), ec2.Port.tcp(443));
 
+    // VPC endpoints ---
+    // For Fargate with ECR in isolated subnet, ECR_DOCKER and S3 private endpoint are needed.
+    // refs https://docs.aws.amazon.com/AmazonECR/latest/userguide/vpc-endpoints.html
+    vpc.addInterfaceEndpoint("vpcEcrEndpoint", {
+      service: ec2.InterfaceVpcEndpointAwsService.ECR_DOCKER,
+      subnets: vpc.selectSubnets({ subnetGroupName: "App" }),
+      securityGroups: [sgRepository],
+    });
+    vpc.addS3Endpoint("vpcS3Endpoint", [snApp]);
+
     return {
       vpc,
-      snIngress: vpc.selectSubnets({ subnetGroupName: "Ingress" }),
-      snApp: vpc.selectSubnets({ subnetGroupName: "App" }),
-      snData: vpc.selectSubnets({ subnetGroupName: "Data" }),
+      snIngress,
+      snApp,
+      snData,
       sgALB,
       sgApp,
       sgDB,
       sgRedis,
-      sgRepository,
     };
   }
 
-  createALB(vpc: ec2.Vpc, sg: ec2.SecurityGroup, subnets: ec2.SubnetSelection) {
+  createALB(
+    vpc: ec2.Vpc,
+    sg: ec2.SecurityGroup,
+    subnets: ec2.SubnetSelection,
+    certArn: string
+  ) {
     const alb = new elbv2.ApplicationLoadBalancer(this, "ALB", {
       vpc,
       vpcSubnets: subnets,
@@ -110,12 +163,7 @@ export class CdkStack extends cdk.Stack {
     alb
       .addListener("albListner443", {
         port: 443,
-        certificateArns: [
-          new cdk.CfnParameter(this, "certArnParam", {
-            type: "String",
-            description: "ALB certficate arn",
-          }).valueAsString,
-        ],
+        certificateArns: [certArn],
       })
       .addTargetGroups("albListener443TargetGroups", {
         targetGroups: [
@@ -130,26 +178,15 @@ export class CdkStack extends cdk.Stack {
       });
   }
 
-  createECR(
-    vpc: ec2.Vpc,
-    sg: ec2.SecurityGroup,
-    subnets: ec2.SubnetSelection
-  ): ecr.Repository {
-    const repository = new ecr.Repository(this, "ecrRepository");
-    // For Fargate in isolated subnet, ECR_DOCKER and S3 private endpoint are needed.
-    // refs https://docs.aws.amazon.com/AmazonECR/latest/userguide/vpc-endpoints.html
-    vpc.addInterfaceEndpoint("vpcEcrEndpoint", {
-      service: ec2.InterfaceVpcEndpointAwsService.ECR_DOCKER,
-      subnets: vpc.selectSubnets({ subnetGroupName: "App" }),
-      securityGroups: [sg],
-    });
-    vpc.addS3Endpoint("vpcS3Endpoint", [subnets]);
-
-    return repository;
-  }
-
-  createECS(vpc: ec2.Vpc, sg: ec2.SecurityGroup, repository: ecr.Repository) {
-    const cluster = new ecs.Cluster(this, "Cluster", { vpc });
+  createTasks(
+    repoName: string,
+    dbHost: string,
+    dbUser: string,
+    dbName: string,
+    redisHost: string,
+    dbPassName: string,
+    secretName: string
+  ): ecs.TaskDefinition {
     const taskDefinition = new ecs.TaskDefinition(this, "ecsTaskDef", {
       compatibility: ecs.Compatibility.FARGATE,
       cpu: "256",
@@ -165,24 +202,54 @@ export class CdkStack extends cdk.Stack {
     });
     taskDefinition
       .addContainer("ecsContanerApp", {
-        image: ecs.ContainerImage.fromEcrRepository(repository),
+        image: ecs.ContainerImage.fromEcrRepository(
+          ecr.Repository.fromRepositoryName(this, "repository", repoName)
+        ),
+        environment: {
+          RAILS_ENV: "production",
+          RAILS_DB_HOST: dbHost,
+          RAILS_DB_PORT: "3306",
+          RAILS_DB_DATABASE: dbName,
+          RAILS_DB_USERNAME: dbUser,
+          RAILS_REDIS_HOST: redisHost,
+          RAILS_REDIS_PORT: "6379",
+        },
+        secrets: {
+          RAILS_DB_PASSWORD: ecs.Secret.fromSsmParameter(
+            ssm.StringParameter.fromSecureStringParameterAttributes(
+              this,
+              "DbPass",
+              {
+                parameterName: dbPassName,
+                version: 1,
+                simpleName: !dbPassName.startsWith("/"),
+              }
+            )
+          ),
+          RAILS_SECRET_KEY_BASE: ecs.Secret.fromSsmParameter(
+            ssm.StringParameter.fromSecureStringParameterAttributes(
+              this,
+              "SecretKeyBase",
+              {
+                parameterName: secretName,
+                version: 1,
+                simpleName: !secretName.startsWith("/"),
+              }
+            )
+          ),
+        },
       })
       .addPortMappings({ containerPort: 80 });
-    new ecs.FargateService(this, "ecsFargateService", {
-      cluster,
-      taskDefinition,
-      vpcSubnets: vpc.selectSubnets({ subnetGroupName: "App" }),
-      securityGroup: sg,
-    });
+
+    return taskDefinition;
   }
 
-  createRedis(sg: ec2.SecurityGroup, subnets: ec2.SubnetSelection) {
+  createRedis(sg: ec2.SecurityGroup, subnets: ec2.SubnetSelection): string {
     const snGroup = new elasticache.CfnSubnetGroup(this, "cacheSubnetGroup", {
       description: "cache subnet group",
       subnetIds: subnets.subnets?.map((sn) => sn.subnetId) || [],
     });
-    snGroup.cacheSubnetGroupName;
-    new elasticache.CfnCacheCluster(this, "Redis", {
+    const redis = new elasticache.CfnCacheCluster(this, "Redis", {
       azMode: "single-az",
       cacheNodeType: "cache.t3.micro",
       cacheSubnetGroupName: snGroup.ref, // with snGroup.cacheSubnetGroupName, it dooesn't work
@@ -191,9 +258,18 @@ export class CdkStack extends cdk.Stack {
       numCacheNodes: 1,
       vpcSecurityGroupIds: [sg.securityGroupId],
     });
+
+    return redis.attrRedisEndpointAddress;
   }
 
-  createRDS(vpc: ec2.Vpc, sg: ec2.SecurityGroup, subnets: ec2.SubnetSelection) {
+  createRDS(
+    vpc: ec2.Vpc,
+    sg: ec2.SecurityGroup,
+    subnets: ec2.SubnetSelection,
+    userName: string,
+    passName: string,
+    dbName: string
+  ): string {
     const db = new rds.DatabaseInstance(this, "RDS", {
       vpc,
       vpcPlacement: subnets,
@@ -205,8 +281,10 @@ export class CdkStack extends cdk.Stack {
         ec2.InstanceSize.MICRO
       ),
       multiAz: false,
-      masterUsername: "raislapp",
-      databaseName: "railsapp",
+      deletionProtection: false, // MEMO: for development
+      masterUsername: userName,
+      masterUserPassword: cdk.SecretValue.ssmSecure(passName, "1"), // FIXME: fixed version
+      databaseName: dbName,
       allocatedStorage: 10,
       parameterGroup: new rds.ParameterGroup(this, "rdsParamGroup", {
         family: "mariadb10.4",
@@ -220,5 +298,7 @@ export class CdkStack extends cdk.Stack {
         },
       }),
     });
+
+    return db.dbInstanceEndpointAddress;
   }
 }

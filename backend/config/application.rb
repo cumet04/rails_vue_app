@@ -33,6 +33,8 @@ module RailsVue
       manager.default_strategies(:password)
     end
 
+    config.secret_key_base = ENV.fetch("RAILS_SECRET_KEY_BASE")
+
     # middleware config
     config.session_store(
       :redis_store,

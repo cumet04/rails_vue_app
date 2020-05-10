@@ -41,6 +41,7 @@ services:
       - RAILS_DB_PASSWORD=""
       - RAILS_REDIS_HOST=redis
       - RAILS_REDIS_PORT=6379
+      - RAILS_SECRET_KEY_BASE=""
     depends_on:
       - db
       - redis
