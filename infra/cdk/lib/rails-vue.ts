@@ -17,7 +17,25 @@ interface IParams {
   appSecretParamName: string;
 }
 
+function ssmSecretParam(
+  id: string,
+  name: string,
+  version?: number
+): ecs.Secret {
+  // @ts-ignore
+  const scope: cdk.Construct = this;
+  return ecs.Secret.fromSsmParameter(
+    ssm.StringParameter.fromSecureStringParameterAttributes(scope, id, {
+      parameterName: name,
+      version: version ?? 1,
+      simpleName: !name.startsWith("/"),
+    })
+  );
+}
+
 export class RailsVue extends cdk.Stack {
+  params: IParams;
+
   constructor(
     scope: cdk.Construct,
     id: string,
@@ -25,6 +43,8 @@ export class RailsVue extends cdk.Stack {
     props?: cdk.StackProps
   ) {
     super(scope, id, props);
+
+    this.params = params;
 
     const {
       vpc,
@@ -38,25 +58,10 @@ export class RailsVue extends cdk.Stack {
     } = this.createVpc();
 
     const redisHost = this.createRedis(sgRedis, snData);
-    const dbHost = this.createRDS(
-      vpc,
-      sgDB,
-      snData,
-      params.dbUser,
-      params.dbPassParamName,
-      params.dbName
-    );
-    const taskDefinition = this.createTasks(
-      params.repoName,
-      dbHost,
-      params.dbUser,
-      params.dbName,
-      redisHost,
-      params.dbPassParamName,
-      params.appSecretParamName
-    );
+    const dbHost = this.createRDS(vpc, sgDB, snData);
+    const taskDefinition = this.createTasks(dbHost, redisHost);
 
-    this.createALB(vpc, sgALB, snIngress, params.certArn);
+    this.createALB(vpc, sgALB, snIngress);
 
     const cluster = new ecs.Cluster(this, "Cluster", { vpc });
     new ecs.FargateService(this, "ecsFargateService", {
@@ -141,12 +146,9 @@ export class RailsVue extends cdk.Stack {
     };
   }
 
-  createALB(
-    vpc: ec2.Vpc,
-    sg: ec2.SecurityGroup,
-    subnets: ec2.SubnetSelection,
-    certArn: string
-  ) {
+  createALB(vpc: ec2.Vpc, sg: ec2.SecurityGroup, subnets: ec2.SubnetSelection) {
+    const cert = this.params.certArn;
+
     const alb = new elbv2.ApplicationLoadBalancer(this, "ALB", {
       vpc,
       vpcSubnets: subnets,
@@ -163,7 +165,7 @@ export class RailsVue extends cdk.Stack {
     alb
       .addListener("albListner443", {
         port: 443,
-        certificateArns: [certArn],
+        certificateArns: [cert],
       })
       .addTargetGroups("albListener443TargetGroups", {
         targetGroups: [
@@ -178,15 +180,13 @@ export class RailsVue extends cdk.Stack {
       });
   }
 
-  createTasks(
-    repoName: string,
-    dbHost: string,
-    dbUser: string,
-    dbName: string,
-    redisHost: string,
-    dbPassName: string,
-    secretName: string
-  ): ecs.TaskDefinition {
+  createTasks(dbHost: string, redisHost: string): ecs.TaskDefinition {
+    const dbPass = this.params.dbPassParamName;
+    const dbName = this.params.dbName;
+    const dbUser = this.params.dbUser;
+    const secret = this.params.appSecretParamName;
+    const repo = this.params.repoName;
+
     const taskDefinition = new ecs.TaskDefinition(this, "ecsTaskDef", {
       compatibility: ecs.Compatibility.FARGATE,
       cpu: "256",
@@ -203,7 +203,7 @@ export class RailsVue extends cdk.Stack {
     taskDefinition
       .addContainer("ecsContanerApp", {
         image: ecs.ContainerImage.fromEcrRepository(
-          ecr.Repository.fromRepositoryName(this, "repository", repoName)
+          ecr.Repository.fromRepositoryName(this, "repository", repo)
         ),
         environment: {
           RAILS_ENV: "production",
@@ -215,28 +215,8 @@ export class RailsVue extends cdk.Stack {
           RAILS_REDIS_PORT: "6379",
         },
         secrets: {
-          RAILS_DB_PASSWORD: ecs.Secret.fromSsmParameter(
-            ssm.StringParameter.fromSecureStringParameterAttributes(
-              this,
-              "DbPass",
-              {
-                parameterName: dbPassName,
-                version: 1,
-                simpleName: !dbPassName.startsWith("/"),
-              }
-            )
-          ),
-          RAILS_SECRET_KEY_BASE: ecs.Secret.fromSsmParameter(
-            ssm.StringParameter.fromSecureStringParameterAttributes(
-              this,
-              "SecretKeyBase",
-              {
-                parameterName: secretName,
-                version: 1,
-                simpleName: !secretName.startsWith("/"),
-              }
-            )
-          ),
+          RAILS_DB_PASSWORD: ssmSecretParam("DbParam", dbPass),
+          RAILS_SECRET_KEY_BASE: ssmSecretParam("SecretKeyBase", secret),
         },
       })
       .addPortMappings({ containerPort: 80 });
@@ -265,11 +245,12 @@ export class RailsVue extends cdk.Stack {
   createRDS(
     vpc: ec2.Vpc,
     sg: ec2.SecurityGroup,
-    subnets: ec2.SubnetSelection,
-    userName: string,
-    passName: string,
-    dbName: string
+    subnets: ec2.SubnetSelection
   ): string {
+    const dbPass = this.params.dbPassParamName;
+    const dbName = this.params.dbName;
+    const dbUser = this.params.dbUser;
+
     const db = new rds.DatabaseInstance(this, "RDS", {
       vpc,
       vpcPlacement: subnets,
@@ -282,8 +263,8 @@ export class RailsVue extends cdk.Stack {
       ),
       multiAz: false,
       deletionProtection: false, // MEMO: for development
-      masterUsername: userName,
-      masterUserPassword: cdk.SecretValue.ssmSecure(passName, "1"), // FIXME: fixed version
+      masterUsername: dbUser,
+      masterUserPassword: cdk.SecretValue.ssmSecure(dbPass, "1"), // FIXME: fixed version
       databaseName: dbName,
       allocatedStorage: 10,
       parameterGroup: new rds.ParameterGroup(this, "rdsParamGroup", {
