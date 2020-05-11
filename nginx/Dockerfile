@@ -17,4 +17,4 @@ RUN envsubst '$ASSETS_HOST' < ./assets_location.conf.template > ./assets_locatio
 
 RUN mkdir /app
 WORKDIR /app
-COPY ./public /app/
+COPY ./public /app/public

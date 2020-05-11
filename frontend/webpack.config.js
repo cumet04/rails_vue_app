@@ -8,7 +8,7 @@ const assets_path = "/assets";
 module.exports = {
   entry: ["./src/index.js"],
   output: {
-    path: path.resolve(__dirname, `../nginx/public${assets_path}`),
+    path: path.resolve(__dirname, `dist${assets_path}`),
     filename: "bundle.js",
   },
   mode: "production",

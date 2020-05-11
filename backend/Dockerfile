@@ -2,7 +2,9 @@ FROM ruby:2.6.6
 
 WORKDIR /app
 COPY Gemfile Gemfile.lock ./
-RUN bundle install
+ARG ENV="prod"
+RUN bundle install \
+    $(test "$ENV" = "prod" && echo '--without test development --deployment')
 
 COPY . /app
 

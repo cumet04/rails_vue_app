@@ -13,7 +13,8 @@ interface IParams {
   dbName: string;
   dbUser: string;
   dbPassParamName: string;
-  repoName: string;
+  appRepoName: string;
+  webRepoName: string;
   appSecretParamName: string;
 }
 
@@ -61,16 +62,17 @@ export class RailsVue extends cdk.Stack {
     const dbHost = this.createRDS(vpc, sgDB, snData);
     const taskDefinition = this.createTasks(dbHost, redisHost);
 
-    this.createALB(vpc, sgALB, snIngress);
-
     const cluster = new ecs.Cluster(this, "Cluster", { vpc });
-    new ecs.FargateService(this, "ecsFargateService", {
+    const service = new ecs.FargateService(this, "ecsFargateService", {
       cluster,
       taskDefinition,
       vpcSubnets: snApp,
       securityGroup: sgApp,
-      desiredCount: 0, // There is no ECR image entity on initial deploy
     });
+
+    this.createALB(vpc, sgALB, snIngress, service);
+
+    // migration task
   }
 
   createVpc(): {
@@ -146,7 +148,12 @@ export class RailsVue extends cdk.Stack {
     };
   }
 
-  createALB(vpc: ec2.Vpc, sg: ec2.SecurityGroup, subnets: ec2.SubnetSelection) {
+  createALB(
+    vpc: ec2.Vpc,
+    sg: ec2.SecurityGroup,
+    subnets: ec2.SubnetSelection,
+    service: ecs.BaseService
+  ) {
     const cert = this.params.certArn;
 
     const alb = new elbv2.ApplicationLoadBalancer(this, "ALB", {
@@ -167,16 +174,9 @@ export class RailsVue extends cdk.Stack {
         port: 443,
         certificateArns: [cert],
       })
-      .addTargetGroups("albListener443TargetGroups", {
-        targetGroups: [
-          new elbv2.ApplicationTargetGroup(this, "albtgApp", {
-            vpc,
-            targetType: elbv2.TargetType.IP,
-            protocol: elbv2.ApplicationProtocol.HTTP,
-            port: 80,
-            // NOTE: no default targets
-          }),
-        ],
+      .addTargets("albtgApp", {
+        targets: [service],
+        protocol: elbv2.ApplicationProtocol.HTTP,
       });
   }
 
@@ -185,7 +185,8 @@ export class RailsVue extends cdk.Stack {
     const dbName = this.params.dbName;
     const dbUser = this.params.dbUser;
     const secret = this.params.appSecretParamName;
-    const repo = this.params.repoName;
+    const appRepo = this.params.appRepoName;
+    const webRepo = this.params.webRepoName;
 
     const taskDefinition = new ecs.TaskDefinition(this, "ecsTaskDef", {
       compatibility: ecs.Compatibility.FARGATE,
@@ -203,7 +204,14 @@ export class RailsVue extends cdk.Stack {
     taskDefinition
       .addContainer("ecsContanerApp", {
         image: ecs.ContainerImage.fromEcrRepository(
-          ecr.Repository.fromRepositoryName(this, "repository", repo)
+          ecr.Repository.fromRepositoryName(this, "webRepository", webRepo)
+        ),
+      })
+      .addPortMappings({ containerPort: 80 });
+    taskDefinition
+      .addContainer("ecsContanerApp", {
+        image: ecs.ContainerImage.fromEcrRepository(
+          ecr.Repository.fromRepositoryName(this, "appRepository", appRepo)
         ),
         environment: {
           RAILS_ENV: "production",
@@ -219,7 +227,7 @@ export class RailsVue extends cdk.Stack {
           RAILS_SECRET_KEY_BASE: ssmSecretParam("SecretKeyBase", secret),
         },
       })
-      .addPortMappings({ containerPort: 80 });
+      .addPortMappings({ containerPort: 3000 });
 
     return taskDefinition;
   }

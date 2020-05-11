@@ -11,6 +11,7 @@ new RailsVue(app, "RailsVue", {
   dbName: "railsvue",
   dbUser: "railsvue",
   dbPassParamName: env.PASS_PARAM_NAME!,
-  repoName: env.REPO_NAME!,
+  appRepoName: env.APP_REPO_NAME!,
+  webRepoName: env.WEB_REPO_NAME!,
   appSecretParamName: env.APP_SECRET_PARAM_NAME!,
 });
