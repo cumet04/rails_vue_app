@@ -1,8 +1,6 @@
 user nginx;
 worker_processes auto;
 
-worker_rlimit_nofile 8192;
-
 events {
   worker_connections 45535;
   multi_accept on;
