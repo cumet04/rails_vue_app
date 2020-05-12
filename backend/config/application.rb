@@ -24,6 +24,7 @@ module RailsVue
     config.log_tags = [:request_id]
     config.logger = ActiveSupport::Logger.new(STDOUT)
     config.log_formatter = ::Logger::Formatter.new
+    config.action_view.logger = nil # Not to show logs like Rendered xxxx.html.erb
     config.active_support.deprecation = :notify
 
     config.i18n.fallbacks = true
