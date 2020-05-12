@@ -33,7 +33,7 @@
 </template>
 
 <script>
-import PostListItem from "~/components/PostListItem";
+import PostListItem from "/src/components/PostListItem.vue";
 
 export default {
   props: ["props"],

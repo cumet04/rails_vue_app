@@ -7,3 +7,8 @@ Rails + Vueの部分については[記事](https://qiita.com/cumet04/items/52cc
 
 ## 開発環境
 `docker-compose up`して http://localhost:5000 にアクセス
+
+* assets_path, dev:prod問題
+* application.html.erbのstyleタグ
+* エントリポイントjsのパス
+* ビルド成果物のパス

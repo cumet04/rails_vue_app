@@ -43,7 +43,7 @@
 </template>
 
 <script>
-import CommentListItem from "~/components/CommentListItem";
+import CommentListItem from "/src/components/CommentListItem.vue";
 
 export default {
   props: ["props"],

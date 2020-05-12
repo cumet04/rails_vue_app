@@ -1,4 +1,4 @@
-import { Pages } from "~/pages";
+import { Pages } from "../pages.js";
 
 const name = window._application.path
   .replace(/^\//, "") // trim initial slash

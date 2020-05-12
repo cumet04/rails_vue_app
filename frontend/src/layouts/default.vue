@@ -10,7 +10,7 @@
 
 <script>
 import { Page, ViewProps } from "./vars";
-import TheHeader from "~/components/TheHeader";
+import TheHeader from "/src/components/TheHeader.vue";
 
 export default {
   components: {

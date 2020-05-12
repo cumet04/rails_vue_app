@@ -7,8 +7,12 @@
     <div class="account">
       <template v-if="user">
         <div class="user" @click="menuOpen">
-          <img class="icon" :src="imageUrl('ico-account.svg')" alt="account" />
-          <div class="user_name">
+          <img
+            class="icon"
+            src="/src/assets/images/ico-account.svg"
+            alt="account"
+          />
+          <div class="name">
             {{ user.name }}
           </div>
         </div>

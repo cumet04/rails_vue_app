@@ -1,23 +1,9 @@
-import "../node_modules/ress/dist/ress.min.css";
-import "~/assets/css/common.css";
+import "/node_modules/ress/dist/ress.min.css";
+import "./assets/css/common.css";
 
-import Vue from "vue";
-import Layout from "~/layouts/default";
+import { createApp } from "vue";
+import Layout from "./layouts/default.vue";
 
-import RailsForm from "~/components/RailsForm";
-Vue.component("rails-form", RailsForm);
+import RailsForm from "./components/RailsForm.vue";
 
-Vue.mixin({
-  methods: {
-    imageUrl(path) {
-      const file = require(`~/assets/images/${path}`);
-      return `${ASSETS_PATH}/${file}`;
-    },
-  },
-});
-
-new Vue({
-  el: "#app",
-  components: { Layout },
-  template: `<Layout></Layout>`,
-});
+createApp(Layout).component("rails-form", RailsForm).mount("#app");

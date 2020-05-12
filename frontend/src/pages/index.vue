@@ -34,8 +34,8 @@
 </template>
 
 <script>
-import PostListItem from "~/components/PostListItem";
-import UserListItem from "~/components/UserListItem";
+import PostListItem from "/src/components/PostListItem.vue";
+import UserListItem from "/src/components/UserListItem.vue";
 
 export default {
   props: ["props"],

@@ -47,7 +47,7 @@ function run() {
         .replace(/^$/, "index"); // "index" for "/"
       return {
         path,
-        file: `./pages/${file}.vue`,
+        file: `/src/pages/${file}.vue`,
       };
     });
 
