@@ -60,7 +60,7 @@ export default {
   },
   computed: {
     isMyPost() {
-      return this.author.id == this.props.currentUser.id;
+      return this.author.id == this.props.currentUser?.id;
     },
     contentLines() {
       return this.post.content.split("\n");
