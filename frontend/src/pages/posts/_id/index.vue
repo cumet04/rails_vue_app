@@ -1,10 +1,10 @@
 <template>
   <main>
     <article class="article">
-      <header class="article_header">
-        <div class="article_header_content">
-          <h1 class="article_title">{{ post.title }}</h1>
-          <div class="article_info">
+      <header class="header">
+        <div class="content">
+          <h1 class="title">{{ post.title }}</h1>
+          <div class="info">
             <div>
               by
               <a :href="`/users/${author.id}`" v-if="author.id != null">
@@ -79,20 +79,20 @@ export default {
   background-color: white;
   padding: 10px;
 
-  &_header {
+  & .header {
     display: flex;
     margin-bottom: 20px;
 
-    &_content {
+    & .content {
       flex-grow: 1;
     }
   }
 
-  &_title {
+  & .title {
     font-size: 3rem;
   }
 
-  &_info {
+  & .info {
     display: flex;
     justify-content: space-between;
     font-size: 1.4rem;
