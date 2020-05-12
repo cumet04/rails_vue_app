@@ -6,7 +6,7 @@ RUN rm -rf ./conf.d && \
     rm ./*_params ./koi-utf ./koi-win ./win-utf
 
 ARG ENV="prod"
-ARG PUMA_HOST="localhost"
+ARG PUMA_HOST="127.0.0.1"
 ARG ASSETS_HOST
 ARG EDGE_PROTO="https"
 

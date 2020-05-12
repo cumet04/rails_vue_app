@@ -6,7 +6,9 @@ namespace :ridgepole do
     if Rails.application.config.active_record.dump_schema_after_migration
       Rake::Task["db:schema:dump"].invoke
     end
-    Rake::Task["annotate_models"].invoke
+    if Rails.env.development?
+      Rake::Task["annotate_models"].invoke
+    end
   end
 
   desc "Export database schema"

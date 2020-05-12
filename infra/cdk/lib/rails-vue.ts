@@ -18,20 +18,17 @@ interface IParams {
   appSecretParamName: string;
 }
 
-function ssmSecretParam(
+function ssmSecureString(
+  scope: cdk.Construct,
   id: string,
   name: string,
   version?: number
-): ecs.Secret {
-  // @ts-ignore
-  const scope: cdk.Construct = this;
-  return ecs.Secret.fromSsmParameter(
-    ssm.StringParameter.fromSecureStringParameterAttributes(scope, id, {
-      parameterName: name,
-      version: version ?? 1,
-      simpleName: !name.startsWith("/"),
-    })
-  );
+): ssm.IStringParameter {
+  return ssm.StringParameter.fromSecureStringParameterAttributes(scope, id, {
+    parameterName: name,
+    version: version ?? 1,
+    simpleName: !name.startsWith("/"),
+  });
 }
 
 export class RailsVue extends cdk.Stack {
@@ -71,8 +68,6 @@ export class RailsVue extends cdk.Stack {
     });
 
     this.createALB(vpc, sgALB, snIngress, service);
-
-    // migration task
   }
 
   createVpc(): {
@@ -121,7 +116,7 @@ export class RailsVue extends cdk.Stack {
     sgDB.addIngressRule(sgApp, ec2.Port.tcp(3306));
 
     const sgRedis = new ec2.SecurityGroup(this, "sgRedis", { vpc });
-    sgRedis.addIngressRule(sgApp, ec2.Port.tcp(3306));
+    sgRedis.addIngressRule(sgApp, ec2.Port.tcp(6379));
 
     const sgRepository = new ec2.SecurityGroup(this, "sgRepository", { vpc });
     sgRepository.addIngressRule(ec2.Peer.anyIpv4(), ec2.Port.tcp(443));
@@ -135,6 +130,11 @@ export class RailsVue extends cdk.Stack {
       securityGroups: [sgRepository],
     });
     vpc.addS3Endpoint("vpcS3Endpoint", [snApp]);
+
+    vpc.addInterfaceEndpoint("vpcLogsEndpoint", {
+      service: ec2.InterfaceVpcEndpointAwsService.CLOUDWATCH_LOGS,
+      subnets: vpc.selectSubnets({ subnetGroupName: "App" }),
+    });
 
     return {
       vpc,
@@ -188,7 +188,11 @@ export class RailsVue extends cdk.Stack {
     const appRepo = this.params.appRepoName;
     const webRepo = this.params.webRepoName;
 
-    const taskDefinition = new ecs.TaskDefinition(this, "ecsTaskDef", {
+    const dbPassParam = ssmSecureString(this, "DbParam", dbPass);
+    const appSecretParam = ssmSecureString(this, "SecretKeyBase", secret);
+
+    // normal task ----------
+    const taskDefProps: ecs.TaskDefinitionProps = {
       compatibility: ecs.Compatibility.FARGATE,
       cpu: "256",
       memoryMiB: "512",
@@ -199,37 +203,70 @@ export class RailsVue extends cdk.Stack {
             "service-role/AmazonECSTaskExecutionRolePolicy"
           ),
         ],
+        inlinePolicies: {
+          access_secrets: new iam.PolicyDocument({
+            statements: [
+              new iam.PolicyStatement({
+                actions: ["ssm:GetParameter"],
+                resources: [
+                  dbPassParam.parameterArn,
+                  appSecretParam.parameterArn,
+                ],
+              }),
+            ],
+          }),
+        },
       }),
-    });
-    taskDefinition
-      .addContainer("ecsContanerApp", {
+    };
+    const taskDef = new ecs.TaskDefinition(this, "ecsTaskDef", taskDefProps);
+
+    taskDef
+      .addContainer("ecsContanerWeb", {
         image: ecs.ContainerImage.fromEcrRepository(
           ecr.Repository.fromRepositoryName(this, "webRepository", webRepo)
         ),
+        logging: new ecs.AwsLogDriver({
+          streamPrefix: "railsvue",
+        }),
       })
       .addPortMappings({ containerPort: 80 });
-    taskDefinition
-      .addContainer("ecsContanerApp", {
-        image: ecs.ContainerImage.fromEcrRepository(
-          ecr.Repository.fromRepositoryName(this, "appRepository", appRepo)
-        ),
-        environment: {
-          RAILS_ENV: "production",
-          RAILS_DB_HOST: dbHost,
-          RAILS_DB_PORT: "3306",
-          RAILS_DB_DATABASE: dbName,
-          RAILS_DB_USERNAME: dbUser,
-          RAILS_REDIS_HOST: redisHost,
-          RAILS_REDIS_PORT: "6379",
-        },
-        secrets: {
-          RAILS_DB_PASSWORD: ssmSecretParam("DbParam", dbPass),
-          RAILS_SECRET_KEY_BASE: ssmSecretParam("SecretKeyBase", secret),
-        },
-      })
+
+    const containerProps: ecs.ContainerDefinitionOptions = {
+      image: ecs.ContainerImage.fromEcrRepository(
+        ecr.Repository.fromRepositoryName(this, "appRepository", appRepo)
+      ),
+      environment: {
+        RAILS_ENV: "production",
+        RAILS_DB_HOST: dbHost,
+        RAILS_DB_PORT: "3306",
+        RAILS_DB_DATABASE: dbName,
+        RAILS_DB_USERNAME: dbUser,
+        RAILS_REDIS_HOST: redisHost,
+        RAILS_REDIS_PORT: "6379",
+      },
+      secrets: {
+        RAILS_DB_PASSWORD: ecs.Secret.fromSsmParameter(dbPassParam),
+        RAILS_SECRET_KEY_BASE: ecs.Secret.fromSsmParameter(appSecretParam),
+      },
+      logging: new ecs.AwsLogDriver({
+        streamPrefix: "railsvue",
+      }),
+    };
+    taskDef
+      .addContainer("ecsContanerApp", containerProps)
       .addPortMappings({ containerPort: 3000 });
 
-    return taskDefinition;
+    // migration task ----------
+    new ecs.TaskDefinition(
+      this,
+      "ecsMigrationTaskDef",
+      taskDefProps
+    ).addContainer("ecsContanerApp", {
+      ...containerProps,
+      command: ["bundle", "exec", "rails", "ridgepole:apply"],
+    });
+
+    return taskDef;
   }
 
   createRedis(sg: ec2.SecurityGroup, subnets: ec2.SubnetSelection): string {
