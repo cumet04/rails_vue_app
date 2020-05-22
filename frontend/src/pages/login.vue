@@ -4,13 +4,13 @@
       <div class="form-field">
         <label>
           email
-          <input type="email" name="email" />
+          <input type="email" name="email" required/>
         </label>
       </div>
       <div class="form-field">
         <label>
           password
-          <input type="password" name="password" id="" />
+          <input type="password" name="password" id="" required/>
         </label>
       </div>
       <button type="submit">login</button>

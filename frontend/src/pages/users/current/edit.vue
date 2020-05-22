@@ -8,12 +8,14 @@
         name="name"
         placeholder="Your name for display"
         :value="props.user.name"
+        required
       />
       <textarea
         class="input area"
         name="biography"
         placeholder="Introduce yourself (optional)"
         :value="props.user.biography"
+        required
       ></textarea>
       <div class="button_area">
         <button class="button" type="submit">UPDATE</button>

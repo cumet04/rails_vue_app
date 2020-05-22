@@ -27,6 +27,7 @@ class Post < ApplicationRecord
   has_many :comments
 
   validates :title, presence: true
+  validates :content, presence: true
 
   def view_data
     ViewData::Post.generate(self)
