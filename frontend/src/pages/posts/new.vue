@@ -7,11 +7,13 @@
         type="text"
         name="title"
         placeholder="Awesome post title"
+        required
       />
       <textarea
         class="input area"
         name="content"
         placeholder="Awesome post content"
+        required
       ></textarea>
       <div class="button_area">
         <button class="button" type="submit">POST</button>

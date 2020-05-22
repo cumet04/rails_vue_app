@@ -3,7 +3,11 @@ class SessionController < ApplicationController
   end
 
   def create
-    warden.authenticate!
+    if params[:email].blank? || params[:password].blank?
+      # This is abnormal case bacause frontend validates them
+      head 400 and return
+    end
+    warden.authenticate! # TODO: page for failure
     redirect_to root_path
   end
 

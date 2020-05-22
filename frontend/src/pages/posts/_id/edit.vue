@@ -3,17 +3,19 @@
     <h1>Edit post</h1>
     <rails-form class="form" :action="`/posts/${post.id}`" method="put">
       <input
-        class="input input_line"
+        class="input line"
         type="text"
         name="title"
         placeholder="Awesome post title"
         :value="post.title"
+        required
       />
       <textarea
-        class="input input_area"
+        class="input area"
         name="content"
         placeholder="Awesome post content"
         :value="post.content"
+        required
       ></textarea>
       <div class="button_area">
         <button class="button" type="submit">POST</button>
@@ -45,11 +47,11 @@ export default {
   margin-bottom: 20px;
   padding: 5px;
 
-  &_line {
+  &.line {
     border-bottom: lightgray solid 1px;
   }
 
-  &_area {
+  &.area {
     resize: none;
     height: 500px;
     border: lightgray solid 1px;

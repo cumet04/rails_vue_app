@@ -5,7 +5,7 @@ class PostsController < ApplicationController
 
   def create
     unless current_user
-      head 400 and return
+      head 403 and return
     end
 
     post = current_user.posts.create!(
@@ -16,6 +16,7 @@ class PostsController < ApplicationController
   end
 
   def new
+    redirect_to login_path unless current_user
   end
 
   def edit

@@ -2,18 +2,26 @@
   <main>
     <h1>Create new user</h1>
     <rails-form class="form" action="/users" method="post">
-      <input class="input line" type="text" name="email" placeholder="Email" />
+      <input
+        class="input line"
+        type="text"
+        name="email"
+        placeholder="Email"
+        required
+      />
       <input
         class="input line"
         type="password"
         name="password"
         placeholder="Password"
+        required
       />
       <input
         class="input line"
         type="text"
         name="name"
         placeholder="Your name for display"
+        required
       />
       <textarea
         class="input area"
