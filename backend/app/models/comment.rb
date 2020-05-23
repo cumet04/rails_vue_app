@@ -21,6 +21,7 @@
 #  fk_rails_...  (author_id => users.id)
 #
 class Comment < ApplicationRecord
+  include Likeable
   include Deletable
 
   belongs_to :author, class_name: User.name

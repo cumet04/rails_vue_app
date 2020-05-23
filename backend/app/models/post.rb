@@ -22,6 +22,7 @@
 #
 class Post < ApplicationRecord
   include Deletable
+  include Likeable
 
   belongs_to :author, class_name: User.name
   has_many :comments

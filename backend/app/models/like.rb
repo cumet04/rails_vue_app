@@ -21,7 +21,30 @@
 #  fk_rails_...  (liked_by_id => users.id)
 #
 class Like < ApplicationRecord
+  LIKEABLE_CLASS = [Post.name, Comment.name]
   include Deletable
 
   belongs_to :liked_by, class_name: User.name
+
+  validate :validate_target
+
+  def target
+    target_type.constantize.find_by(id: target_id)
+  end
+
+  def target=(value)
+    target_type = value.class.name
+    target_id = value.id
+  end
+
+  private
+
+  def validate_target
+    unless Like::LIKEABLE_CLASS.include?(self.target_type)
+      errors.add(:target_type, ": unexpected type")
+    end
+    unless target
+      errors.add(:target_type, ": not exist")
+    end
+  end
 end

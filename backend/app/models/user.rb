@@ -21,6 +21,7 @@ class User < ApplicationRecord
   include Deletable
 
   has_many :posts, foreign_key: :author_id
+  has_many :likes, foreign_key: :liked_by_id
 
   validates :email, presence: true
   validate :validate_password, if: :new_record?
