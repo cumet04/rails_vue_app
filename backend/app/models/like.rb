@@ -37,6 +37,10 @@ class Like < ApplicationRecord
     target_id = value.id
   end
 
+  def self.likeable?(target)
+    LIKEABLE_CLASS.include?(target.class.name)
+  end
+
   private
 
   def validate_target

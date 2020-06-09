@@ -44,6 +44,20 @@ class User < ApplicationRecord
     ViewData::User.generate(self)
   end
 
+  def add_like!(target)
+    raise NotLikeableError.new(target) unless Like.likeable?(target)
+    begin
+      target.likes.create!(liked_by: self)
+    rescue ActiveRecord::RecordNotUnique
+      # ignore duplicate entry
+    end
+  end
+
+  def remove_like!(target)
+    raise NotLikeableError.new(target) unless Like.likeable?(target)
+    target.likes.find_by(liked_by: self)&.delete!
+  end
+
   private
 
   def validate_password
