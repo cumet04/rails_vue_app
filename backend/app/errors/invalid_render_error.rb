@@ -1,3 +1,5 @@
+# refs ApplicationRecord#as_json
+
 class InvalidRenderError < StandardError
   attr_reader :target
 

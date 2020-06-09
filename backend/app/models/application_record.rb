@@ -3,7 +3,7 @@ class ApplicationRecord < ActiveRecord::Base
 
   alias_method :model_as_json, :as_json
 
-  # guard for directly rendering ApplicationRecord instance by mistake
+  # guard from directly rendering ApplicationRecord instance by mistake
   def as_json(*)
     raise InvalidRenderError.new(self)
   end
