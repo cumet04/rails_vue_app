@@ -9,7 +9,7 @@ class CurrentUserController < ApplicationController
   end
 
   def edit
-    view_props[:user] = editable_user
+    view_props[:user] = editable_user.view_data
   end
 
   def update
