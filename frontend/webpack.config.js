@@ -30,11 +30,7 @@ module.exports = {
         loader: "babel-loader",
       },
       {
-        test: /\.css$/,
-        use: ["vue-style-loader", "css-loader"],
-      },
-      {
-        test: /\.postcss$/,
+        test: /\.(post)?css$/,
         use: ["vue-style-loader", "css-loader", "postcss-loader"],
       },
       {
