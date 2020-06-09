@@ -7,9 +7,15 @@ Rails.application.routes.draw do
     delete "logout" => "session#destroy"
 
     scope :users do
-      scope :current do
-        resource "", as: :current_user, controller: :current_user,
+      scope :current, as: :current_user do
+        resource "", controller: :current_user,
                      only: [:edit, :show, :update, :destroy]
+        scope :likes do
+          post "posts/:id" => "current_user#add_like_post"
+          delete "posts/:id" => "current_user#delete_like_post"
+          post "comments/:id" => "current_user#add_like_comment"
+          delete "comments/:id" => "current_user#delete_like_comment"
+        end
       end
 
       resources "", as: :users, controller: :users,

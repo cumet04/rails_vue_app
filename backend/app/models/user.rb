@@ -53,9 +53,9 @@ class User < ApplicationRecord
     end
   end
 
-  def remove_like!(target)
+  def delete_like!(target)
     raise NotLikeableError.new(target) unless Like.likeable?(target)
-    target.likes.find_by(liked_by: self)&.delete!
+    target.likes.available.find_by(liked_by: self)&.delete!
   end
 
   private
