@@ -3,9 +3,14 @@ import "~/assets/css/common.css";
 
 import Vue from "vue";
 import Layout from "~/layouts/default";
+import axios from "axios";
 
 import RailsForm from "~/components/RailsForm";
 Vue.component("rails-form", RailsForm);
+
+Vue.prototype.$axios = axios.create({
+  headers: { "X-CSRF-TOKEN": document.head.children["csrf-token"].content },
+});
 
 Vue.mixin({
   methods: {

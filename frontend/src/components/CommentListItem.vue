@@ -17,6 +17,9 @@
       <div class="content">
         {{ comment.content }}
       </div>
+      <button class="like" @click="likeAction">
+        <img class="icon" :src="likeIco()" alt="like" />
+      </button>
     </li>
   </div>
 </template>
@@ -31,6 +34,21 @@ export default {
       return timeago.format(Date.parse(this.comment.createdAt));
     },
   },
+  methods: {
+    likeIco() {
+      return this.imageUrl(
+        this.comment.isLiked ? "ico-like_filled.svg" : "ico-like.svg"
+      );
+    },
+    likeAction() {
+      this.$axios
+        .request({
+          url: "/users/current/likes/comments/" + this.comment.id,
+          method: this.comment.isLiked ? "delete" : "post",
+        })
+        .then(() => (this.comment.isLiked = !this.comment.isLiked));
+    },
+  },
 };
 </script>
 
@@ -38,6 +56,25 @@ export default {
 .contents {
   border-top: #ddd solid 1px;
   padding: 8px;
+  padding-right: 28px;
+  position: relative;
+}
+
+.like {
+  position: absolute;
+  top: 0;
+  right: 8px;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  &:focus {
+    outline: none;
+  }
+
+  & .icon {
+    width: 20px;
+    height: 20px;
+  }
 }
 
 .info {
