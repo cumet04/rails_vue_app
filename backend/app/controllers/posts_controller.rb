@@ -1,6 +1,6 @@
 class PostsController < ApplicationController
   def index
-    view_props[:posts] = accessible(Post).map(&:view_data)
+    view_props[:posts] = accessible(Post).map { |p| p.view_data(current_user) }
   end
 
   def create
@@ -20,7 +20,7 @@ class PostsController < ApplicationController
   end
 
   def edit
-    view_props[:post] = editable_post.view_data
+    view_props[:post] = editable_post.view_data(current_user)
   end
 
   def update
@@ -33,7 +33,7 @@ class PostsController < ApplicationController
   end
 
   def show
-    view_props[:post] = accessible(Post).find(params[:id]).view_data
+    view_props[:post] = accessible(Post).find(params[:id]).view_data(current_user)
   end
 
   def destroy

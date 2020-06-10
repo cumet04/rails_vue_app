@@ -4,12 +4,13 @@ class CurrentUserController < ApplicationController
   end
 
   def show
-    view_props[:user] = current_user.view_data
-    view_props[:posts] = current_user.posts.map(&:view_data)
+    u = current_user
+    view_props[:user] = u.view_data
+    view_props[:posts] = accessible(u.posts).map { |p| p.view_data(u) }
   end
 
   def edit
-    view_props[:user] = editable_user
+    view_props[:user] = editable_user.view_data
   end
 
   def update
@@ -24,6 +25,26 @@ class CurrentUserController < ApplicationController
     editable_user.delete!
     warden.logout
     redirect_to root_path
+  end
+
+  def add_like_post
+    editable_user.add_like!(Post.find(params[:id]))
+    head 201
+  end
+
+  def delete_like_post
+    editable_user.delete_like!(Post.find(params[:id]))
+    head 202
+  end
+
+  def add_like_comment
+    editable_user.add_like!(Comment.find(params[:id]))
+    head 201
+  end
+
+  def delete_like_comment
+    editable_user.delete_like!(Comment.find(params[:id]))
+    head 202
   end
 
   private

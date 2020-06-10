@@ -16,15 +16,20 @@
         </span>
         <span class="when">{{ when }}</span>
       </div>
+      <like-button :targetType="'post'" :target="post"></like-button>
     </li>
   </div>
 </template>
 
 <script>
 import * as timeago from "timeago.js";
+import LikeButton from "~/components/LikeButton";
 
 export default {
   props: ["post"],
+  components: {
+    "like-button": LikeButton,
+  },
   computed: {
     when() {
       return timeago.format(Date.parse(this.post.createdAt));
@@ -37,6 +42,8 @@ export default {
 .contents {
   border-top: #ddd solid 1px;
   padding: 4px 8px;
+  padding-right: 28px;
+  position: relative;
 }
 
 .title {

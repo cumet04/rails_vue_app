@@ -17,15 +17,20 @@
       <div class="content">
         {{ comment.content }}
       </div>
+      <like-button :targetType="'comment'" :target="comment"></like-button>
     </li>
   </div>
 </template>
 
 <script>
 import * as timeago from "timeago.js";
+import LikeButton from "~/components/LikeButton";
 
 export default {
   props: ["comment"],
+  components: {
+    "like-button": LikeButton,
+  },
   computed: {
     when() {
       return timeago.format(Date.parse(this.comment.createdAt));
@@ -38,6 +43,8 @@ export default {
 .contents {
   border-top: #ddd solid 1px;
   padding: 8px;
+  padding-right: 28px;
+  position: relative;
 }
 
 .info {

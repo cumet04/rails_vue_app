@@ -16,9 +16,9 @@ class ApplicationController < ActionController::Base
     warden.user
   end
 
-  # shorthand of "klass.accessible_by(current_ability).available"
-  def accessible(klass)
-    scope = klass.accessible_by(current_ability)
+  # shorthand of "relation.accessible_by(current_ability).available"
+  def accessible(relation)
+    scope = relation.accessible_by(current_ability)
     scope.respond_to?(:available) ? scope.available : scope
   end
 

@@ -6,11 +6,22 @@ Rails.application.routes.draw do
     post "login" => "session#create"
     delete "logout" => "session#destroy"
 
-    resource "users/current",
-             as: :current_user,
-             controller: :current_user,
-             only: [:edit, :show, :update, :destroy]
-    resources :users, only: [:index, :create, :new, :show]
+    scope :users do
+      scope :current, as: :current_user do
+        resource "", controller: :current_user,
+                     only: [:edit, :show, :update, :destroy]
+        scope :likes do
+          post "posts/:id" => "current_user#add_like_post"
+          delete "posts/:id" => "current_user#delete_like_post"
+          post "comments/:id" => "current_user#add_like_comment"
+          delete "comments/:id" => "current_user#delete_like_comment"
+        end
+      end
+
+      resources "", as: :users, controller: :users,
+                    only: [:index, :create, :new, :show]
+    end
+
     resources :posts
 
     get "*path" => "application#render_404"

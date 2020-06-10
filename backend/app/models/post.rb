@@ -22,6 +22,7 @@
 #
 class Post < ApplicationRecord
   include Deletable
+  include Likeable
 
   belongs_to :author, class_name: User.name
   has_many :comments
@@ -29,7 +30,7 @@ class Post < ApplicationRecord
   validates :title, presence: true
   validates :content, presence: true
 
-  def view_data
-    ViewData::Post.generate(self)
+  def view_data(current_user = nil)
+    ViewData::Post.generate(self, current_user)
   end
 end

@@ -3,9 +3,19 @@ import "~/assets/css/common.css";
 
 import Vue from "vue";
 import Layout from "~/layouts/default";
+import { ViewProps } from "./vars";
+import axios from "axios";
 
 import RailsForm from "~/components/RailsForm";
 Vue.component("rails-form", RailsForm);
+
+Vue.prototype.$axios = axios.create({
+  headers: { "X-CSRF-TOKEN": document.head.children["csrf-token"].content },
+});
+Vue.prototype.$appData = {
+  // MEMO: Maybe it's good to use vuex
+  currentUser: ViewProps.currentUser,
+};
 
 Vue.mixin({
   methods: {
@@ -19,5 +29,6 @@ Vue.mixin({
 new Vue({
   el: "#app",
   components: { Layout },
-  template: `<Layout></Layout>`,
+  data: { props: ViewProps },
+  template: `<Layout :props="props"></Layout>`,
 });
